@@ -18,6 +18,7 @@ export default function DeviceHub() {
   }, []);
 
   if (loading) return <p>Loading device...</p>;
+  if (!device) return <p>No device data available.</p>; // prevents crashes
 
   return (
     <div style={{ padding: "1rem" }}>
