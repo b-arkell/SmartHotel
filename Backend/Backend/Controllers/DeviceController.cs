@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Backend.Models;
+using Backend.Services;
 
 namespace Backend.Controllers
 {
@@ -7,16 +8,28 @@ namespace Backend.Controllers
     [Route("[controller]")]
     public class DeviceController : ControllerBase
     {
+        private static Device _device = new Device
+        {
+            Id = 1,
+            Name = "Light",
+            Status = "Off"
+        };
+
         [HttpGet]
         public IActionResult GetDevice()
         {
-            var device = new Device
+            return Ok(_device);
+        }
+
+        [HttpPut]
+        public IActionResult SetDeviceStatus([FromBody] string status)
+        {
+            if (status != "On" && status != "Off")
             {
-                Id = 1,
-                Name = "Light",
-                Status = "Off"
-            };
-            return Ok(device);
+                return BadRequest("Invalid status. Use 'On' or 'Off'.");
+            }
+            _device.setLight(status);
+            return Ok(_device);
         }
     }
 }

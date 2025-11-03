@@ -7,5 +7,13 @@
 
         public string Status { get; set; } = "Off";
 
+        public void setLight(string state)
+        {
+            if (state == "On" || state == "Off")
+            {
+                Status = state;
+            }
+        }
+
     }
 }
