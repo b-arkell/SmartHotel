@@ -413,3 +413,6 @@ dist/
 .env.development.local
 .env.test.local
 .env.production.local
+
+#launch Settings 
+/Backend/Properties/launchSettings.json
