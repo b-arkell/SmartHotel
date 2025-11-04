@@ -20,7 +20,7 @@ export default function HotelHub() {
       });
   }, []); */
 
-useEffect(() => {     // Dummy hotel data 
+useEffect(() => {     // Dummy hotel data
     const mockHotel = {
       id: 1,
       name: "Smart Hotel",
