@@ -69,7 +69,7 @@ namespace Backend.Services
             };
         }
         // helps controllers find rooms and devices
-        public IDevice? GetDeviceById(int roomId, int deviceId)
+        public object? GetDeviceById(int roomId, int deviceId)
         {
             return Hotel.Floors
                 .SelectMany(f => f.Rooms)
@@ -82,6 +82,30 @@ namespace Backend.Services
             return Hotel.Floors
                 .SelectMany(f => f.Rooms)
                 .FirstOrDefault(r => r.Id == roomId);
+        }
+
+        public IEnumerable<IDevice>? GetDevicesInRoom(int roomId)
+        {
+            var room = GetRoom(roomId);
+            return room?.Devices;
+        }
+
+        // send command to a device
+        public bool SendCommmand(int roomId, int deviceId, string command)
+        {
+            var device = GetDeviceById(roomId, deviceId);
+            if (device == null)
+            {
+                return false;
+            }
+
+            if (device is IControllable controllable)
+            {
+                controllable.ExecuteCommand(command);
+                return true;
+            }
+
+            return false;
         }
     }
 }
