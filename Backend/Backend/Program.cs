@@ -1,3 +1,5 @@
+using Backend.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -10,7 +12,18 @@ builder.Services.AddSingleton<Backend.Services.HotelSetup>(); // This will initi
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.UseAllOfToExtendReferenceSchemas();
+    c.SelectSubTypesUsing(baseType =>
+    {
+        if (baseType == typeof(IDevice))
+            return new[] { typeof(Light), typeof(Thermostat) }; // add your other device types here
+        return Enumerable.Empty<Type>();
+    });
+});
+
+
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
