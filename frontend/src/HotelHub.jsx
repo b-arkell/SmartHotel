@@ -6,7 +6,7 @@ export default function HotelHub() {
   const[selectedRoomId, setSelectedRoomId] = useState(null);
   const[loading, setLoading] = useState(true);
 
-  /* TODO: Implement proper useEffect()
+  /* TODO: Implement proper useEffect() for HotelHub
   useEffect(() => {
     fetch(`${process.env.REACT_APP_API_URL}/hotel`)
       .then((res) => res.json())
