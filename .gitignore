@@ -415,4 +415,4 @@ dist/
 .env.production.local
 
 #launch Settings 
-/Backend/Properties/launchSettings.json
+/Backend/Backend/Properties/launchSettings.json
