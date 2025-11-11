@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HotelHub from "./Hubs/HotelHub";
 import GuestHub from "./Hubs/GuestHub";
-import StartScreen from "./Hubs/StartScreen"; 
+import StartScreen from "./Hubs/StartScreen";
 
 function App() {
   return (
