@@ -1,10 +1,25 @@
 using Backend.Models;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Builder;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(options =>
+    {
+        // Preserve the concrete type of each object in JSON
+        options.SerializerSettings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Auto;
+
+        // Optional: make JSON more readable
+        options.SerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented;
+
+        // Optional: ignore nulls if desired
+        // options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
+    });
+
 
 // Add singleton service for hotel setup
 builder.Services.AddSingleton<Backend.Services.HotelSetup>(); // This will initialize the hotel structure at startup
