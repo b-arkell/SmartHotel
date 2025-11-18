@@ -41,7 +41,7 @@ namespace Backend.Controllers
         }
 
         //  send command to a device
-        [HttpPut]
+        [HttpPut("{roomId}/{deviceId}/command")]
         public IActionResult SendCommandToDevice(int roomId, int deviceId, [FromBody] string command)
         {
             var success = _HotelSetup.SendCommmand(roomId, deviceId, command);
