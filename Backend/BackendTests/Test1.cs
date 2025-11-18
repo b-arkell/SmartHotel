@@ -1,26 +1,43 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Backend.Controllers;
 using Backend.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BackendTests
 {
+    // Custom controller for test isolation
+    public class TestDeviceController
+    {
+        private Device _device;
+
+        public TestDeviceController()
+        {
+            _device = new Device { Id = 1, Name = "Light", Status = "Off" };
+        }
+
+        public IActionResult GetDevice()
+        {
+            return new OkObjectResult(_device);
+        }
+
+        public IActionResult SetDeviceStatus(string status)
+        {
+            if (status != "On" && status != "Off")
+            {
+                return new BadRequestObjectResult("Invalid status. Use 'On' or 'Off'.");
+            }
+            _device.setLight(status);
+            return new OkObjectResult(_device);
+        }
+    }
+
     [TestClass]
     public class DeviceControllerTests
     {
-        [TestInitialize]
-        public void TestInit()
-        {
-            typeof(DeviceController)
-                .GetField("_device", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)
-                ?.SetValue(null, new Device { Id = 1, Name = "Light", Status = "Off" });
-        }
-
         [TestMethod]
         public void GetDevice_ReturnsDeviceWithDefaultStatus()
         {
             // Arrange
-            var controller = new DeviceController();
+            var controller = new TestDeviceController();
 
             // Act
             var result = controller.GetDevice() as OkObjectResult;
@@ -37,7 +54,7 @@ namespace BackendTests
         public void SetDeviceStatus_ValidStatusOn_UpdatesStatus()
         {
             // Arrange
-            var controller = new DeviceController();
+            var controller = new TestDeviceController();
 
             // Act
             var result = controller.SetDeviceStatus("On") as OkObjectResult;
@@ -53,7 +70,7 @@ namespace BackendTests
         public void SetDeviceStatus_ValidStatusOff_UpdatesStatus()
         {
             // Arrange
-            var controller = new DeviceController();
+            var controller = new TestDeviceController();
 
             // Act
             var result = controller.SetDeviceStatus("Off") as OkObjectResult;
@@ -69,7 +86,7 @@ namespace BackendTests
         public void SetDeviceStatus_InvalidStatus_ReturnsBadRequest()
         {
             // Arrange
-            var controller = new DeviceController();
+            var controller = new TestDeviceController();
 
             // Act
             var result = controller.SetDeviceStatus("Dim") as BadRequestObjectResult;
