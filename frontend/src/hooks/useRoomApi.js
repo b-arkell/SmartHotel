@@ -24,7 +24,7 @@ export function useRoomApi(roomId) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [roomId]);
 
   const sendCommand = useCallback(async (roomId, deviceId, command) => {
     setError(null);

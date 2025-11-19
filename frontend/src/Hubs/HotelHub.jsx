@@ -41,6 +41,7 @@ export default function HotelHub() {
 
     const loadDevices = async () => {
       const devices = await fetchRoomDevices();
+      console.log("Fetched devices:", devices);
       setRoomDevices(devices);
     };
 
