@@ -1,11 +1,15 @@
 import { useState, useCallback } from "react";
 
 export function useRoomApi(roomId) {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchRoomDevices = async () => {
+  const fetchRoomDevices = useCallback(async () => {
+    if (!roomId) return [];
+
     setLoading(true);
+    setError(null);
+
     try {
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/api/Room/${roomId}/devices`
@@ -20,9 +24,11 @@ export function useRoomApi(roomId) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const sendCommand = async (roomId, deviceId, command) => {
+  const sendCommand = useCallback(async (roomId, deviceId, command) => {
+    setError(null);
+
     try {
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/api/Room/${roomId}/${deviceId}/command`,
@@ -39,6 +45,7 @@ export function useRoomApi(roomId) {
       setError(err.message);
       return false; // Indicate failure
     }
-  };
+  }, []);
+
   return { fetchRoomDevices, sendCommand, loading, error };
 }
