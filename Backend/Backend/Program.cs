@@ -23,7 +23,7 @@ builder.Services.AddControllers()
 
 // Add singleton service for hotel setup
 builder.Services.AddSingleton<Backend.Services.HotelSetup>(); // This will initialize the hotel structure at startup
-
+builder.Services.AddHostedService<SensorUpdateService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
