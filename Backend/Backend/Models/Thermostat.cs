@@ -7,7 +7,18 @@
         public string Type { get; set; } = "Controllable";
         public double TargetTemperature { get; set; }
 
-        public TemperatureSensor Sensor { get; set; } = new();
+        public TemperatureSensor Sensor { get; set; }
+
+        // Constructor with file path
+        public Thermostat(string temperatureFilePath)
+        {
+            Sensor = new TemperatureSensor(temperatureFilePath);
+        }
+        // Default constructor without filepath
+        public Thermostat()
+        {
+            Sensor = new TemperatureSensor();
+        }
 
         public void ExecuteCommand(string command)
         {
@@ -20,8 +31,10 @@
                     TargetTemperature = temp;
                 }
             }
-
+            else if (command == "GetTemperature")
+            {
+                TargetTemperature = Sensor.GetNextTemperature();
+            }
         }
     }
-   
 }
