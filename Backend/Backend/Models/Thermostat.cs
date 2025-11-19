@@ -1,11 +1,12 @@
 ﻿namespace Backend.Models
 {
-    public class Thermostat : IDevice, IControllable
+    public class Thermostat : IDevice, IControllable, ISensor
     {
         public int Id { get; set; }
         public string Name { get; set; } = "Thermostat";
         public string Type { get; set; } = "Controllable";
         public double TargetTemperature { get; set; }
+        public double currentTemperature { get; set; }
 
         public TemperatureSensor Sensor { get; set; }
 
@@ -31,10 +32,12 @@
                     TargetTemperature = temp;
                 }
             }
-            else if (command == "GetTemperature")
-            {
-                TargetTemperature = Sensor.GetNextTemperature();
-            }
+           
+        }
+
+        public void UpdateFromFile()
+        {
+            currentTemperature = Sensor.GetNextTemperature();
         }
     }
 }
