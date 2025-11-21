@@ -108,5 +108,10 @@ namespace Backend.Services
 
             return false;
         }
+
+        public Hotel GetHotel()
+        {
+            return  Hotel;
+        }
     }
 }
