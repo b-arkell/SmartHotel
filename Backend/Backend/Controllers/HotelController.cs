@@ -7,23 +7,23 @@ namespace Backend.Controllers
     [Route("api/[controller]")]
     public class HotelController : ControllerBase
     {
-        // GET: api/hotel
-        [HttpGet]
-        public IActionResult Get()
-        {
-            // Just return a simple message or dummy data
-            return Ok(new
-            {
-                Message = "HotelController is working!",
-                Time = System.DateTime.Now
-            });
-        }
-
         private readonly HotelSetup _HotelSetup;
 
         public HotelController(HotelSetup hotelSetup)
         {
             _HotelSetup = hotelSetup;
+        }
+
+        // GET: api/hotel
+        [HttpGet]
+        public IActionResult Get()
+        {
+            var hotel = _HotelSetup.GetHotel();
+            if (hotel == null)
+            {
+                return NotFound("Hotel data not found.");
+            }
+            return Ok(hotel);
         }
 
         // Example Get endpoint
