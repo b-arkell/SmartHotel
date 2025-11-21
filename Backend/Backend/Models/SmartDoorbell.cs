@@ -7,44 +7,35 @@ namespace Backend.Models
 
         public int Id { get; set; }
         public string Name { get; set; } = "Smart Doorbell";
-        public string Type { get; set; } = "Sensor";
-        public bool IsMotionDetected { get; set; }
-
-        private MotionSensor motionSensor;
+        public string Type { get; set; } = "Doorbell";
 
         public string IdleImagePath { get; set; } = "Images/idle.jpg";
         public string MotionImagePath { get; set; } = "Images/snif.jpg";
 
-        public string CurrentImage { get; private set; }
+        public string currentImage { get; private set; }
 
+        private MotionSensor Sensor;
+        public bool isMotionDetected { get; private set; }
 
         public SmartDoorbell()
         {
-            motionSensor = new MotionSensor();
+            Sensor = new MotionSensor();
 
-            CurrentImage = IdleImagePath;
+            currentImage = IdleImagePath;
         }
 
-        public SmartDoorbell(string filePath)
+        public SmartDoorbell(string motionFileName)
         {
-            motionSensor = new MotionSensor(filePath);
-            CurrentImage = IdleImagePath;
+            Sensor = new MotionSensor(motionFileName);
+            currentImage = IdleImagePath;
         }
         
         public void UpdateFromFile()
         {
-            motionSensor.UpdateFromFile();
-            if (motionSensor.IsMotionDetected)
-            {
-                CurrentImage = MotionImagePath;
-                IsMotionDetected = true;
-            }
+            Sensor.GetNextMotionValue();
 
-            else
-            {
-                CurrentImage = IdleImagePath;
-                IsMotionDetected = false;
-            }
+            isMotionDetected = Sensor.isMotionDetected;
+            currentImage = Sensor.isMotionDetected ? MotionImagePath : IdleImagePath;
 
         }
     }

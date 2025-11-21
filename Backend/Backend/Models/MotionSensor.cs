@@ -8,15 +8,20 @@ namespace Backend.Models
         public int Id { get; set; }
         public string Name { get; set; } = "Motion Sensor";
         public string Type { get; set; } = "Sensor";
-        public bool IsMotionDetected { get; set; }
+        public bool isMotionDetected { get; set; }
 
         private List<bool> motionValues = new();
         private int currentIndex = 0;
-        private string filePath;
 
         public MotionSensor()
         {
-            filePath = Path.Combine(DefaultDirectory, "default.txt");
+            LoadMotionValuesFromFile(Path.Combine(DefaultDirectory, "default.txt"));
+        }
+
+
+        public MotionSensor(string filename)
+        {
+            var filePath = Path.Combine(DefaultDirectory, filename);
             LoadMotionValuesFromFile(filePath);
         }
 
@@ -40,33 +45,26 @@ namespace Backend.Models
                     throw new InvalidDataException($"Invalid motion value: {line}");
                 }
             }
+            if (motionValues.Count == 0)
+                throw new InvalidDataException("Motion sensor file contains no data.");
         }
 
-        public MotionSensor(string filename)
+
+        public bool GetNextMotionValue()
         {
-            filePath = Path.Combine(DefaultDirectory, filename);
+            if (motionValues.Count == 0)
+                throw new InvalidDataException("No motion data loaded.");
+
+            bool detected = motionValues[currentIndex];
+            currentIndex = (currentIndex +1) % motionValues.Count;
+
+            isMotionDetected = detected;
+            return detected;
         }
 
         public void UpdateFromFile()
         {
-            try
-            {
-                if (!File.Exists(filePath))
-                {
-                    Console.WriteLine($"Motion sensor file not found: {filePath}");
-                    return;
-                }
-                string text = File.ReadLines(filePath).First().Trim();
-
-                if (bool.TryParse(text, out bool detected))
-                    IsMotionDetected = detected;
-                else
-                    Console.WriteLine($"Invalid format in file: {text}");
-            }
-            catch (Exception)
-            {
-                Console.WriteLine("Error reading motion sensor file.");
-            }
+            GetNextMotionValue();
         }
     }
     
