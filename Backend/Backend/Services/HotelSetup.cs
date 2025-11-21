@@ -33,7 +33,7 @@ namespace Backend.Services
                                 Devices = new List<IDevice>
                                 {
                                     new Light { Id = 1, Name = "Ceiling Light" },
-                                    new Thermostat { Id = 2, Name = "Thermostat", TargetTemperature = 20},
+                                    new Thermostat("default.txt") { Id = 2, Name = "Thermostat", TargetTemperature = 20},
                                     new Light {Id = 7, Name = "Lamp"}
                                 }
                             },

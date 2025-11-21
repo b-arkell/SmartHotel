@@ -1,13 +1,25 @@
 ﻿namespace Backend.Models
 {
-    public class Thermostat : IDevice, IControllable
+    public class Thermostat : IDevice, IControllable, ISensor
     {
         public int Id { get; set; }
         public string Name { get; set; } = "Thermostat";
         public string Type { get; set; } = "Controllable";
         public double TargetTemperature { get; set; }
+        public double currentTemperature { get; set; }
 
-        public TemperatureSensor Sensor { get; set; } = new();
+        public TemperatureSensor Sensor { get; set; }
+
+        // Constructor with file path
+        public Thermostat(string temperatureFilePath)
+        {
+            Sensor = new TemperatureSensor(temperatureFilePath);
+        }
+        // Default constructor without filepath
+        public Thermostat()
+        {
+            Sensor = new TemperatureSensor();
+        }
 
         public void ExecuteCommand(string command)
         {
@@ -20,8 +32,12 @@
                     TargetTemperature = temp;
                 }
             }
+           
+        }
 
+        public void UpdateFromFile()
+        {
+            currentTemperature = Sensor.GetNextTemperature();
         }
     }
-   
 }

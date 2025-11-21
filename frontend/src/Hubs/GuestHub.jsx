@@ -98,6 +98,15 @@ export default function GuestHub() {
                 {/* Thermostat Controls */}
                 {device.targetTemperature !== undefined && (
                   <div style={{ marginTop: "0.5rem" }}>
+                    {/* Current Temperature */}
+                    <div style={{ marginBottom: "0.25rem", fontWeight: "500" }}>
+                      Current Temperature:{" "}
+                      <span style={{ fontWeight: "bold" }}>
+                        {device.currentTemperature ?? "Loading"}°C
+                      </span>
+                    </div>
+
+                    {/* Target Temperature Input */}
                     <label
                       style={{
                         display: "block",

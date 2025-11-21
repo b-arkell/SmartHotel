@@ -8,7 +8,7 @@ namespace Backend.Models
         public string Name { get; set; } = "Motion Sensor";
         public string Type { get; set; } = "Sensor";
         public bool IsMotionDetected { get; set; }
-        public void UpdateFromFile(string filePath)
+        public void UpdateFromFile()
         {
             try
             {
