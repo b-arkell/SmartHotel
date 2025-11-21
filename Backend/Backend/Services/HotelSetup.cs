@@ -34,7 +34,7 @@ namespace Backend.Services
                                 {
                                     new Light { Id = 1, Name = "Ceiling Light" },
                                     new Thermostat("default.txt") { Id = 2, Name = "Thermostat", TargetTemperature = 20},
-                                    new Light {Id = 7, Name = "Lamp"}
+                                    new Light {Id = 3, Name = "Lamp"}
                                 }
                             },
                             new Room
@@ -43,8 +43,9 @@ namespace Backend.Services
                                 Name = "Room 102",
                                 Devices = new List<IDevice>
                                 {
-                                    new Light { Id = 3, Name = "Main Light" },
-                                    new HVAC { Id = 4, Name = "HVAC System" }
+                                    new Light { Id = 4, Name = "Main Light" },
+                                    new HVAC { Id = 5, Name = "HVAC System" },
+                                    new SmartDoorbell("default") {Id = 6, Name = "SmartDoorbell" }
                                 }
                             }
                         }
@@ -61,7 +62,8 @@ namespace Backend.Services
                                 Name = "Room 201",
                                 Devices = new List<IDevice>
                                 {
-                                    new Light { Id = 6, Name = "Desk Lamp" }
+                                    new Light { Id = 7, Name = "Desk Lamp" },
+                                    new SmartDoorbell("default") { Id = 8, Name = "SmartDoorbell" }
                                 }
                             }
                         }
