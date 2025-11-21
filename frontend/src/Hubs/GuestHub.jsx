@@ -2,18 +2,23 @@ import { useEffect, useState } from "react";
 import { useRoomApi } from "../hooks/useRoomApi";
 
 export default function GuestHub() {
-  const roomId = 101;
-  const [room, setRoom] = useState(null);
+  const storedRoomId = sessionStorage.getItem("selectedRoomNumber");
+  const parsedRoomId = parseInt(storedRoomId, 10);
+  const roomId = !isNaN(parsedRoomId) ? parsedRoomId : null;
+
+  const [room, setRoom] = useState({ name: "", devices: [] });
   const { fetchRoomDevices, sendCommand, loading, error } = useRoomApi(roomId);
 
-  // TODO: Implement proper useEffect() for GuestHub
   useEffect(() => {
+    if (!roomId) return;
+
     const loadDevices = async () => {
       const devices = await fetchRoomDevices();
       setRoom({ name: `Room ${roomId}`, devices });
     };
+
     loadDevices();
-  }, [roomId]);
+  }, [roomId, fetchRoomDevices]);
 
   const handleCommand = async (deviceId, command) => {
     const success = await sendCommand(roomId, deviceId, command);
@@ -23,9 +28,10 @@ export default function GuestHub() {
     }
   };
 
+  if (!roomId) return <p>Error: No valid room selected.</p>;
   if (loading) return <p>Loading room data...</p>;
   if (error) return <p>Error: {error}</p>;
-  if (!room) return <p>No room data available.</p>; // prevents crashes
+  if (!room) return <p>No room data available.</p>;
 
   return (
     <div
