@@ -1,4 +1,6 @@
-﻿namespace Backend.Models
+﻿using System.Globalization;
+
+namespace Backend.Models
 {
     public class MotionSensor : IDevice, ISensor
     {
@@ -8,10 +10,29 @@
         public bool IsMotionDetected { get; set; }
         public void UpdateFromFile(string filePath)
         {
-            // Simulate reading motion detection status from a file
-            // In a real implementation, you would read the file and parse the motion detection value
-            IsMotionDetected = false; // Placeholder value
+            try
+            {
+                if (!File.Exists(filePath))
+                {
+                    Console.WriteLine("Motion sensor file not found.");
+                    return;
+                }
+                string text = File.ReadLines(filePath).First().Trim();
+
+                if (bool.TryParse(text, out bool detected))
+                {
+                    IsMotionDetected = detected;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid format in file.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error reading motion sensor file.");
+            }
         }
     }
     
-}
+}   
