@@ -20,6 +20,17 @@ export default function GuestHub() {
     loadDevices();
   }, [roomId, fetchRoomDevices]);
 
+  useEffect(() => {
+    if (!roomId) return;
+
+    const interval = setInterval(async () => {
+      const devices = await fetchRoomDevices();
+      setRoom({ name: `Room ${roomId}`, devices });
+    }, 10000); // backend updates every 10 seconds
+
+    return () => clearInterval(interval);
+  }, [roomId, fetchRoomDevices]);
+
   const handleCommand = async (deviceId, command) => {
     const success = await sendCommand(roomId, deviceId, command);
     if (success) {
@@ -184,6 +195,32 @@ export default function GuestHub() {
                     <option value={2}>Medium</option>
                     <option value={3}>High</option>
                   </select>
+                )}
+                {device.type === "Doorbell" && (
+                  <div style={{ marginTop: "1rem" }}>
+                    <div style={{ fontWeight: "bold", marginBottom: "0.5rem" }}>
+                      Motion Detected:{" "}
+                      {device.isMotionDetected ? "🚨 YES" : "No"}
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        const imageUrl = `${process.env.REACT_APP_API_URL}/${device.currentImage}`;
+
+                        window.open(imageUrl, "_blank");
+                      }}
+                      style={{
+                        padding: "0.5rem 1rem",
+                        cursor: "pointer",
+                        background: "#3498db",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "4px",
+                      }}
+                    >
+                      View Image
+                    </button>
+                  </div>
                 )}
               </div>
             </li>

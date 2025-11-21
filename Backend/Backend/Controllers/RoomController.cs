@@ -1,5 +1,6 @@
 ﻿using Backend.Services;
 using Microsoft.AspNetCore.Mvc;
+using Backend.Models;
 
 namespace Backend.Controllers
 {
@@ -36,6 +37,11 @@ namespace Backend.Controllers
             {
                 return NotFound("No devices found in the specified room.");
             }
+            //foreach (var sensor in devices.OfType<ISensor>())
+            //{
+            //    sensor.UpdateFromFile();
+                
+            //}
             return Ok(devices);
 
         }

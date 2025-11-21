@@ -30,7 +30,7 @@ public class SensorUpdateService : BackgroundService
                 sensor.UpdateFromFile(); // call update for every sensor in HotelSetup
             }
 
-            await Task.Delay(TimeSpan.FromSeconds(20), stoppingToken); // 20 second refreshes.
+            await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken); // 20 second refreshes.
         }
         
     }

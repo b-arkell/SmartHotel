@@ -45,7 +45,7 @@ namespace Backend.Services
                                 {
                                     new Light { Id = 4, Name = "Main Light" },
                                     new HVAC { Id = 5, Name = "HVAC System" },
-                                    new SmartDoorbell("default") {Id = 6, Name = "SmartDoorbell" }
+                                    new SmartDoorbell("default.txt") {Id = 6, Name = "SmartDoorbell" }
                                 }
                             }
                         }
@@ -63,7 +63,7 @@ namespace Backend.Services
                                 Devices = new List<IDevice>
                                 {
                                     new Light { Id = 7, Name = "Desk Lamp" },
-                                    new SmartDoorbell("default") { Id = 8, Name = "SmartDoorbell" }
+                                    new SmartDoorbell("default.txt") { Id = 8, Name = "SmartDoorbell" }
                                 }
                             }
                         }
