@@ -1,4 +1,6 @@
-﻿namespace Backend.Models
+﻿using System;
+
+namespace Backend.Models
 {
     public class HVAC : IDevice, IControllable
     {
@@ -20,6 +22,8 @@
             }
             if (parts[0] == "SetMode")
             {
+                if (parts.Length != 2)
+                    throw new ArgumentException("SetMode requires a mode argument.");
                 // validate input against the enum (case-insensitive)
                 if (!Enum.TryParse<HVACMode>(parts[1], true, out var parsed))
                 {
@@ -30,6 +34,8 @@
             }
             else if (parts[0] == "SetFanSpeed")
             {
+                if (parts.Length != 2)
+                    throw new ArgumentException("SetFanSpeed requires a value.");
                 // validate input against the enum (case-insensitive)
                 if (!Enum.TryParse<FanSpeedLevel>(parts[1], true, out var parsedSpeed))
                 {
@@ -45,6 +51,28 @@
 
                 FanSpeed = parsedSpeed;
             }
+            else if (parts[0].Equals("IncreaseFanSpeed", StringComparison.OrdinalIgnoreCase))
+            {
+                IncreaseFanSpeed();
+            }
+            else if (parts[0].Equals("DecreaseFanSpeed", StringComparison.OrdinalIgnoreCase))
+            {
+                DecreaseFanSpeed();
+            }
+        }
+
+        public bool IncreaseFanSpeed()
+        {
+            if (FanSpeed == FanSpeedLevel.High) return false; // cannot increment
+            FanSpeed = (FanSpeedLevel)((int)FanSpeed + 1);
+            return true;
+        }
+
+        public bool DecreaseFanSpeed()
+        {
+            if (FanSpeed == FanSpeedLevel.Low) return false; // cannot decrement
+            FanSpeed = (FanSpeedLevel)((int)FanSpeed - 1);
+            return true;
         }
     }
 }
