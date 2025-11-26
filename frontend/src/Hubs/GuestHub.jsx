@@ -169,25 +169,66 @@ export default function GuestHub() {
                   </div>
                 )}
                 {/* HVAC Mode */}
-                {device.Mode !== undefined && (
-                  <select
-                    value={device.Mode}
-                    onChange={(e) =>
-                      handleCommand(device.id, `setMode ${e.target.value}`)
-                    }
-                    style={{ marginLeft: "0.5rem" }}
+                {device.mode !== undefined && (
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "0.5rem",
+                      marginTop: "0.5rem",
+                    }}
                   >
-                    <option value="Fan">Fan</option>
-                    <option value="Cool">Cool</option>
-                    <option value="Heat">Heat</option>
-                  </select>
+                    <button
+                      onClick={() => handleCommand(device.id, "SetMode 0")}
+                      style={{
+                        padding: "0.4rem 0.8rem",
+                        backgroundColor:
+                          device.mode === 0 ? "#3498db" : "#ecf0f1",
+                        color: device.mode === 0 ? "white" : "black",
+                        border: "1px solid #ccc",
+                        borderRadius: "4px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Fan
+                    </button>
+
+                    <button
+                      onClick={() => handleCommand(device.id, "SetMode 1")}
+                      style={{
+                        padding: "0.4rem 0.8rem",
+                        backgroundColor:
+                          device.mode === 1 ? "#3498db" : "#ecf0f1",
+                        color: device.mode === 1 ? "white" : "black",
+                        border: "1px solid #ccc",
+                        borderRadius: "4px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Cool
+                    </button>
+
+                    <button
+                      onClick={() => handleCommand(device.id, "SetMode 2")}
+                      style={{
+                        padding: "0.4rem 0.8rem",
+                        backgroundColor:
+                          device.mode === 2 ? "#3498db" : "#ecf0f1",
+                        color: device.mode === 2 ? "white" : "black",
+                        border: "1px solid #ccc",
+                        borderRadius: "4px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Heat
+                    </button>
+                  </div>
                 )}
                 {/* HVAC Fan Speed */}
-                {device.FanSpeed !== undefined && (
+                {device.fanSpeed !== undefined && (
                   <select
-                    value={device.FanSpeed}
+                    value={device.fanSpeed}
                     onChange={(e) =>
-                      handleCommand(device.id, `setFanSpeed ${e.target.value}`)
+                      handleCommand(device.id, `SetFanSpeed ${e.target.value}`)
                     }
                     style={{ marginLeft: "0.5rem" }}
                   >
@@ -196,6 +237,7 @@ export default function GuestHub() {
                     <option value={3}>High</option>
                   </select>
                 )}
+                {/* Doorbell */}
                 {device.type === "Doorbell" && (
                   <div style={{ marginTop: "1rem" }}>
                     <div style={{ fontWeight: "bold", marginBottom: "0.5rem" }}>
@@ -220,6 +262,78 @@ export default function GuestHub() {
                     >
                       View Image
                     </button>
+                  </div>
+                )}
+                {/* Alarm System */}
+                {device.type === "Alarm" && (
+                  <div
+                    style={{
+                      marginTop: "1rem",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "0.75rem",
+                      alignItems: "flex-start",
+                    }}
+                  >
+                    {/* Alarm Icon */}
+                    <div
+                      style={{
+                        fontSize: "2rem",
+                        fontWeight: "bold",
+                        color: device.isAlarmTriggered ? "red" : "#888",
+                        animation: device.isAlarmTriggered
+                          ? "pulse 1s infinite alternate"
+                          : "none",
+                      }}
+                    >
+                      🔔
+                    </div>
+                    {/* Alarm Label */}
+                    <div
+                      style={{
+                        fontWeight: "bold",
+                        color: device.isAlarmTriggered ? "red" : "gray",
+                      }}
+                    >
+                      {device.isAlarmTriggered
+                        ? "Alarm Trigger!"
+                        : "Alarm Idle"}
+                    </div>
+
+                    {/* Buttons */}
+                    <div style={{ display: "flex", gap: "0.5rem" }}>
+                      {!device.isAlarmTriggered ? (
+                        <button
+                          onClick={() => handleCommand(device.id, "PlayAlarm")}
+                          style={{
+                            padding: "0.4rem 0.8rem",
+                            backgroundColor: "#e74c3c",
+                            color: "white",
+                            border: "1px solid #ccc",
+                            borderRadius: "4px",
+                            cursor: "pointer",
+                          }}
+                        >
+                          Trigger Alarm
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() =>
+                            handleCommand(device.id, "DisarmAlarm")
+                          }
+                          style={{
+                            padding: "0.4rem 0.8rem",
+                            backgroundColor: "#2ecc71",
+                            color: "white",
+                            border: "1px solid #ccc",
+                            borderRadius: "4px",
+                            cursor: "pointer",
+                          }}
+                        >
+                          Disarm Alarm
+                        </button>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
