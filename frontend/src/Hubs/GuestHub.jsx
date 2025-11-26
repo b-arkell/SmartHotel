@@ -169,25 +169,25 @@ export default function GuestHub() {
                   </div>
                 )}
                 {/* HVAC Mode */}
-                {device.Mode !== undefined && (
+                {device.mode !== undefined && (
                   <select
-                    value={device.Mode}
+                    value={device.mode}
                     onChange={(e) =>
-                      handleCommand(device.id, `setMode ${e.target.value}`)
+                      handleCommand(device.id, `SetMode ${e.target.value}`)
                     }
                     style={{ marginLeft: "0.5rem" }}
                   >
-                    <option value="Fan">Fan</option>
-                    <option value="Cool">Cool</option>
-                    <option value="Heat">Heat</option>
+                    <option value={1}>Fan</option>
+                    <option value={2}>Cool</option>
+                    <option value={3}>Heat</option>
                   </select>
                 )}
                 {/* HVAC Fan Speed */}
-                {device.FanSpeed !== undefined && (
+                {device.fanSpeed !== undefined && (
                   <select
-                    value={device.FanSpeed}
+                    value={device.fanSpeed}
                     onChange={(e) =>
-                      handleCommand(device.id, `setFanSpeed ${e.target.value}`)
+                      handleCommand(device.id, `SetFanSpeed ${e.target.value}`)
                     }
                     style={{ marginLeft: "0.5rem" }}
                   >
@@ -196,6 +196,7 @@ export default function GuestHub() {
                     <option value={3}>High</option>
                   </select>
                 )}
+                {/* Doorbell */}
                 {device.type === "Doorbell" && (
                   <div style={{ marginTop: "1rem" }}>
                     <div style={{ fontWeight: "bold", marginBottom: "0.5rem" }}>

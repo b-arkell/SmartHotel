@@ -8,7 +8,7 @@ namespace Backend.Models
         public enum FanSpeedLevel { Low = 1, Medium = 2, High = 3 }
         public int Id { get; set; }
         public string Name { get; set; } = "HVAC System";
-        public string Type { get; set; } = "Controllable";
+        public string Type { get; set; } = "HVAC";
         public HVACMode Mode { get; set; } = HVACMode.Fan; // Fan, Cool, Heat
         public FanSpeedLevel FanSpeed { get; set; } = FanSpeedLevel.Low; // Low, Medium, High
 
