@@ -7,7 +7,7 @@ namespace Backend.Models
 
         public int Id { get; set; }
         public string Name { get; set; } = "Smart Doorbell";
-        public string Type { get; set; } = "Sensor";
+        public string Type { get; set; } = "Alarm";
         public bool IsMotionDetected { get; set; }
         public bool IsAlarmTriggered { get; set; }
 

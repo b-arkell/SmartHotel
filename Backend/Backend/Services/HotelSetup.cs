@@ -63,7 +63,8 @@ namespace Backend.Services
                                 Devices = new List<IDevice>
                                 {
                                     new Light { Id = 7, Name = "Desk Lamp" },
-                                    new SmartDoorbell("default.txt") { Id = 8, Name = "SmartDoorbell" }
+                                    new SmartDoorbell("default.txt") { Id = 8, Name = "SmartDoorbell" },
+                                    new AlarmSystem("default.txt") {Id = 9, Name = "AlarmSystem"}
                                 }
                             }
                         }
