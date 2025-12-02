@@ -3,7 +3,7 @@ using Backend.Models;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Backed.UnitTests
+namespace Backend.UnitTests
 {
     [TestClass]
     public class MotionSensorLogicTests
