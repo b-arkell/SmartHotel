@@ -61,18 +61,27 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors();
 
-app.UseStaticFiles(new StaticFileOptions
+var imagesPath = Path.Combine(app.Environment.ContentRootPath, "Images");
+if (Directory.Exists(imagesPath))
 {
-    FileProvider = new PhysicalFileProvider(
-        Path.Combine(Directory.GetCurrentDirectory(), "Images")),
-    RequestPath = "/Images"
-});
 
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(imagesPath),
+        RequestPath = "/Images"
+    });
+}
 
+if (!app.Environment.IsEnvironment("IntegrationTests"))
+{
 app.UseHttpsRedirection();
+}
 
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
+
+// Required for integration tests
+public partial class Program { }
