@@ -56,10 +56,10 @@ namespace Backend.Models
             return temp;
         }
 
-        public void UpdateFromFile(string filePath)
+        public void UpdateFromFile()
         {
-            LoadTemperaturesFromFile(filePath);
-            currentIndex = 0;
+
+            GetNextTemperature();
         }
     }
 }
