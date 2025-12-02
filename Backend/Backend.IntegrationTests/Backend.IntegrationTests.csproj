@@ -18,6 +18,20 @@
   </ItemGroup>
 
   <ItemGroup>
+  <Content Include="Images\**\*.*">
+    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+  </Content>
+  <Content Include="Mocks\**\*.*">
+    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+  </Content>
+</ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="Images\idle.jpg" />
+    <Content Remove="Images\snif.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
   </ItemGroup>
 
