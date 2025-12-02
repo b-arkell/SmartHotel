@@ -68,6 +68,25 @@ namespace Backend.Services
                                 }
                             }
                         }
+                    },
+                    new Floor
+                    {
+                        Id = 3,
+                        Name = "Third Floor",
+                        Rooms = new List<Room>
+                        {
+                            new Room
+                            {
+                                Id = 301,
+                                Name = "Room 301",
+                                Devices = new List<IDevice>
+                                {
+                                    new Light { Id = 10, Name = "Desk Lamp" },
+                                    new SmartDoorbell("default.txt") { Id = 11, Name = "SmartDoorbell" },
+                                    new AlarmSystem("default.txt") {Id = 12, Name = "AlarmSystem"}
+                                }
+                            }
+                        }
                     }
                 }
             };
