@@ -66,6 +66,17 @@ namespace Backend.Services
                                     new SmartDoorbell("default.txt") { Id = 8, Name = "SmartDoorbell" },
                                     new AlarmSystem("default.txt") {Id = 9, Name = "AlarmSystem"}
                                 }
+                            },
+                             new Room
+                            {
+                                Id = 202,
+                                Name = "Room 202",
+                                Devices = new List<IDevice>
+                                {
+                                    new Light { Id = 13, Name = "Desk Lamp" },
+                                    new SmartDoorbell("default.txt") { Id = 14, Name = "SmartDoorbell" },
+                                    new AlarmSystem("default.txt") {Id = 15, Name = "AlarmSystem"}
+                                }
                             }
                         }
                     },
@@ -79,6 +90,17 @@ namespace Backend.Services
                             {
                                 Id = 301,
                                 Name = "Room 301",
+                                Devices = new List<IDevice>
+                                {
+                                    new Light { Id = 10, Name = "Desk Lamp" },
+                                    new SmartDoorbell("default.txt") { Id = 11, Name = "SmartDoorbell" },
+                                    new AlarmSystem("default.txt") {Id = 12, Name = "AlarmSystem"}
+                                }
+                            },
+                            new Room
+                            {
+                                Id = 302,
+                                Name = "Room 302",
                                 Devices = new List<IDevice>
                                 {
                                     new Light { Id = 10, Name = "Desk Lamp" },
