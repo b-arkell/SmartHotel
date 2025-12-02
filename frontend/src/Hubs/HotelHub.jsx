@@ -217,6 +217,41 @@ export default function HotelHub() {
                         )}
                       </div>
                     )}
+                    {/* HVAC Mode */}
+                    {device.mode !== undefined && (
+                      <div style={{ marginTop: "0.5rem" }}>
+                        <strong>HVAC Mode:</strong> {device.mode === 0 && "Fan"}
+                        {device.mode === 1 && "Cool ❄️"}
+                        {device.mode === 2 && "Heat 🔥"}
+                      </div>
+                    )}
+
+                    {/* Fan Speed */}
+                    {device.fanSpeed !== undefined && (
+                      <div style={{ marginTop: "0.25rem" }}>
+                        <strong>Fan Speed:</strong>{" "}
+                        {device.fanSpeed === 1 && "Low"}
+                        {device.fanSpeed === 2 && "Medium"}
+                        {device.fanSpeed === 3 && "High"}
+                      </div>
+                    )}
+                    {/* Alarm System */}
+                    {device.type === "Alarm" && (
+                      <div style={{ marginTop: "0.75rem" }}>
+                        <div
+                          style={{
+                            fontSize: "1.5rem",
+                            color: device.isAlarmTriggered ? "red" : "gray",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          🔔{" "}
+                          {device.isAlarmTriggered
+                            ? "Alarm TRIGGERED"
+                            : "Alarm Idle"}
+                        </div>
+                      </div>
+                    )}
                   </li>
                 );
               })}
