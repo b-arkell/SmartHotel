@@ -109,6 +109,96 @@ namespace Backend.Services
                                 }
                             }
                         }
+                    },
+                    new Floor
+                    {
+                        Id = 4,
+                        Name = "Fourth Floor",
+                        Rooms = new List<Room>
+                        {
+                            new Room
+                            {
+                                Id = 401,
+                                Name = "Room 401",
+                                Devices = new List<IDevice>
+                                {
+                                    new Light { Id = 16, Name = "Ceiling Light" },
+                                    new Thermostat("default.txt") { Id = 17, Name = "Thermostat", TargetTemperature = 20},
+                                    new Light {Id = 18, Name = "Lamp"}
+                                }
+                            },
+                            new Room
+                            {
+                                Id = 402,
+                                Name = "Room 402",
+                                Devices = new List<IDevice>
+                                {
+                                    new Light { Id = 19, Name = "Main Light" },
+                                    new HVAC { Id = 20, Name = "HVAC System" },
+                                    new SmartDoorbell("default.txt") {Id = 21, Name = "SmartDoorbell" }
+                                }
+                            }
+                        }
+                    },
+                    new Floor
+                    {
+                        Id = 5,
+                        Name = "Fifth Floor",
+                        Rooms = new List<Room>
+                        {
+                            new Room
+                            {
+                                Id = 501,
+                                Name = "Room 501",
+                                Devices = new List<IDevice>
+                                {
+                                    new Light { Id = 22, Name = "Desk Lamp" },
+                                    new SmartDoorbell("default.txt") { Id = 23, Name = "SmartDoorbell" },
+                                    new AlarmSystem("default.txt") {Id = 24, Name = "AlarmSystem"}
+                                }
+                            },
+                             new Room
+                            {
+                                Id = 502,
+                                Name = "Room 502",
+                                Devices = new List<IDevice>
+                                {
+                                    new Light { Id = 25, Name = "Desk Lamp" },
+                                    new SmartDoorbell("default.txt") { Id = 26, Name = "SmartDoorbell" },
+                                    new AlarmSystem("default.txt") {Id = 27, Name = "AlarmSystem"}
+                                }
+                            }
+                        }
+                    },
+                    new Floor
+                    {
+                        Id = 6,
+                        Name = "Sixth Floor",
+                        Rooms = new List<Room>
+                        {
+                            new Room
+                            {
+                                Id = 601,
+                                Name = "Room 601",
+                                Devices = new List<IDevice>
+                                {
+                                    new Light { Id = 28, Name = "Desk Lamp" },
+                                    new SmartDoorbell("default.txt") { Id = 29, Name = "SmartDoorbell" },
+                                    new AlarmSystem("default.txt") {Id = 30, Name = "AlarmSystem"}
+                                }
+                            },
+                            new Room
+                            {
+                                Id = 602,
+                                Name = "Room 602",
+                                Devices = new List<IDevice>
+                                {
+                                    new Light { Id = 31, Name = "Desk Lamp" },
+                                    new SmartDoorbell("default.txt") { Id = 32, Name = "SmartDoorbell" },
+                                    new AlarmSystem("default.txt") {Id = 33, Name = "AlarmSystem"}
+                                }
+                            }
+                        }
                     }
                 }
             };

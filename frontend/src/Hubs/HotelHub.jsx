@@ -8,11 +8,7 @@ export default function HotelHub() {
   const [roomDevices, setRoomDevices] = useState([]);
   const [loadingHotel, setLoadingHotel] = useState(true);
 
-  const {
-    fetchRoomDevices,
-    loading: loadingDevices,
-    error,
-  } = useRoomApi(selectedRoomId);
+  const { fetchRoomDevices, loading: loadingDevices, error } = useRoomApi(selectedRoomId);
 
   useEffect(() => {
     const storedFloor = sessionStorage.getItem("selectedFloorId");
@@ -36,94 +32,69 @@ export default function HotelHub() {
         setLoadingHotel(false);
       }
     };
-
     loadHotel();
   }, []);
 
   useEffect(() => {
     if (!selectedRoomId) return;
-
     const loadDevices = async () => {
       const devices = await fetchRoomDevices();
-      console.log("Fetched devices:", devices);
       setRoomDevices(devices);
     };
-
     loadDevices();
   }, [selectedRoomId, fetchRoomDevices]);
 
-  // To match the floor obj to the selected + find room obj in selected floor
   const selectedFloor = hotel?.floors.find((f) => f.id === selectedFloorId);
-  const selectedRoom = selectedFloor?.rooms.find(
-    (r) => r.id === selectedRoomId
-  );
+  const selectedRoom = selectedFloor?.rooms.find((r) => r.id === selectedRoomId);
 
-  if (loadingHotel) return <p>Loading device...</p>;
-  if (!hotel || !Array.isArray(hotel.floors) || hotel.floors.length === 0) {
-    return <p>No hotel data available.</p>; // prevents crashes
-  }
+  const getDeviceIcon = (device) => {
+    switch (device.type) {
+      case "Light": return "💡";
+      case "Thermostat": return "🌡️";
+      case "Doorbell": return "🔔";
+      case "Alarm": return "🚨";
+      default: return "⚙️";
+    }
+  };
+
+  if (loadingHotel) return <p className="center-text">Loading hotel...</p>;
+  if (!hotel || !Array.isArray(hotel.floors) || hotel.floors.length === 0) return <p className="center-text">No hotel data available.</p>;
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        padding: "2rem",
-        backgroundColor: "#f5f5f5",
-      }}
-    >
-      <h1
-        style={{ textAlign: "center", fontSize: "3rem", marginBottom: "2rem" }}
-      >
-        {hotel.name} Hub
-      </h1>
+    <div className="page">
+      {/* Header */}
+      <header className="header">
+        <button
+          onClick={() => window.history.back()}
+          className="back-btn"
+        >
+          ← Back
+        </button>
+        <h1>Admin Hub</h1>
+      </header>
 
       {/* Floor Selection */}
-      <div
-        style={{
-          display: "flex",
-          gap: "1rem",
-          justifyContent: "center",
-          flexWrap: "wrap",
-        }}
-      >
+      <div className="floors-container">
         {hotel.floors.map((floor) => (
-          <div key={floor.id}>
+          <div key={floor.id} className="floor-card">
             <button
+              className={`floor-btn ${selectedFloorId === floor.id ? "selected" : ""}`}
               onClick={() => {
                 setSelectedFloorId(floor.id);
                 setSelectedRoomId(null);
                 setRoomDevices([]);
-              }}
-              style={{
-                padding: "1rem 2rem",
-                backgroundColor: "#2c3e50",
-                color: "#fff",
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer",
               }}
             >
               {floor.name}
             </button>
 
             {selectedFloorId === floor.id && (
-              <div style={{ marginTop: "0.5rem" }}>
+              <div className="rooms-container">
                 {floor.rooms.map((room) => (
                   <button
                     key={room.id}
+                    className={`room-btn ${selectedRoomId === room.id ? "selected" : ""}`}
                     onClick={() => setSelectedRoomId(room.id)}
-                    style={{
-                      display: "block",
-                      width: "100%",
-                      padding: "0.75rem 1.5rem",
-                      backgroundColor:
-                        selectedRoomId === room.id ? "#34495e" : "#7f8c8d",
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: "4px",
-                      margin: "0.25rem auto",
-                      cursor: "pointer",
-                    }}
                   >
                     {room.name}
                   </button>
@@ -136,129 +107,155 @@ export default function HotelHub() {
 
       {/* Room Devices */}
       {selectedRoom && (
-        <div
-          style={{
-            marginTop: "2rem",
-            padding: "1.5rem",
-            backgroundColor: "#fff",
-            borderRadius: "6px",
-            maxWidth: "700px",
-            margin: "2rem auto",
-          }}
-        >
-          <h2 style={{ textAlign: "center", marginBottom: "1rem" }}>
-            Devices in {selectedRoom.name}
-          </h2>
-
+        <div className="devices-grid">
           {loadingDevices && <p>Loading devices...</p>}
-          {error && <p>Error: {error}</p>}
+          {error && <p className="error-text">Error: {error}</p>}
 
-          {!loadingDevices && !error && (
-            <ul style={{ listStyle: "none", padding: 0 }}>
-              {roomDevices.map((device) => {
-                const offStates = ["Off", "Muted", "Inactive"];
-                return (
-                  <li
-                    key={device.id}
-                    style={{
-                      padding: "0.75rem 1rem",
-                      borderBottom: "1px solid #ddd",
-                      display: "flex",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <div>
-                      <strong>{device.name}</strong> ({device.type})
-                    </div>
+          {!loadingDevices && !error && roomDevices.map((device) => (
+            <div key={device.id} className="device-card">
+              <div className="device-header">
+                <span className="device-icon">{getDeviceIcon(device)}</span>
+                <strong>{device.name}</strong> <span className="device-type">({device.type})</span>
+              </div>
 
-                    {/* Light Status */}
-                    {device.isOn !== undefined && (
-                      <div style={{ marginTop: "0.5rem" }}>
-                        <strong>Status: </strong>{" "}
-                        <span
-                          style={{ color: device.isOn ? "27ae60" : "e74c3c" }}
-                        >
-                          {device.isOn ? "On 💡" : "Off 🔌"}
-                        </span>
-                      </div>
-                    )}
+              {/* Light */}
+              {device.isOn !== undefined && (
+                <div className="device-status">
+                  <strong>Status:</strong> <span className={device.isOn ? "on" : "off"}>{device.isOn ? "On 💡" : "Off 🔌"}</span>
+                </div>
+              )}
 
-                    {/* Thermostat */}
-                    {device.currentTemperature !== undefined && (
-                      <div style={{ marginTop: "0.5rem" }}>
-                        <strong>Current Temp:</strong>{" "}
-                        {device.currentTemperature}°C
-                        <br />
-                        <strong>Target Temp:</strong> {device.targetTemperature}
-                        °C
-                      </div>
-                    )}
+              {/* Thermostat */}
+              {device.currentTemperature !== undefined && (
+                <div className="thermostat">
+                  <div>Current Temp: {device.currentTemperature}°C</div>
+                  <div>Target Temp: {device.targetTemperature}°C</div>
+                </div>
+              )}
 
-                    {/* Doorbell */}
-                    {device.type === "Doorbell" && (
-                      <div style={{ marginTop: "0.5rem" }}>
-                        <div style={{ marginBottom: "0.5rem" }}>
-                          <strong>Motion Detected:</strong>{" "}
-                          {device.isMotionDetected ? "🚨 YES" : "No"}
-                        </div>
+              {/* Doorbell */}
+              {device.type === "Doorbell" && (
+                <div className="doorbell">
+                  <div>Motion Detected: {device.isMotionDetected ? "🚨 YES" : "No"}</div>
+                  {device.currentImage && (
+                    <img src={`${process.env.REACT_APP_API_URL}/${device.currentImage}`} alt="Doorbell snapshot" />
+                  )}
+                </div>
+              )}
 
-                        {device.currentImage && (
-                          <img
-                            src={`${process.env.REACT_APP_API_URL}/${device.currentImage}`}
-                            alt="Doorbell snapshot"
-                            style={{
-                              width: "200px",
-                              height: "auto",
-                              borderRadius: "6px",
-                              border: "1px solid #ccc",
-                              display: "block",
-                            }}
-                          />
-                        )}
-                      </div>
-                    )}
-                    {/* HVAC Mode */}
-                    {device.mode !== undefined && (
-                      <div style={{ marginTop: "0.5rem" }}>
-                        <strong>HVAC Mode:</strong> {device.mode === 0 && "Fan"}
-                        {device.mode === 1 && "Cool ❄️"}
-                        {device.mode === 2 && "Heat 🔥"}
-                      </div>
-                    )}
+              {/* HVAC */}
+              {device.mode !== undefined && (
+                <div className="device-status">HVAC Mode: {device.mode === 0 ? "Fan" : device.mode === 1 ? "Cool ❄️" : "Heat 🔥"}</div>
+              )}
 
-                    {/* Fan Speed */}
-                    {device.fanSpeed !== undefined && (
-                      <div style={{ marginTop: "0.25rem" }}>
-                        <strong>Fan Speed:</strong>{" "}
-                        {device.fanSpeed === 1 && "Low"}
-                        {device.fanSpeed === 2 && "Medium"}
-                        {device.fanSpeed === 3 && "High"}
-                      </div>
-                    )}
-                    {/* Alarm System */}
-                    {device.type === "Alarm" && (
-                      <div style={{ marginTop: "0.75rem" }}>
-                        <div
-                          style={{
-                            fontSize: "1.5rem",
-                            color: device.isAlarmTriggered ? "red" : "gray",
-                            fontWeight: "bold",
-                          }}
-                        >
-                          🔔{" "}
-                          {device.isAlarmTriggered
-                            ? "Alarm TRIGGERED"
-                            : "Alarm Idle"}
-                        </div>
-                      </div>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-          )}
+              {device.fanSpeed !== undefined && (
+                <div className="device-status">Fan Speed: {device.fanSpeed === 1 ? "Low" : device.fanSpeed === 2 ? "Medium" : "High"}</div>
+              )}
+
+              {device.type === "Alarm" && (
+                <div className={`alarm ${device.isAlarmTriggered ? "triggered" : ""}`}>
+                  {device.isAlarmTriggered ? "🚨 Alarm TRIGGERED" : "Alarm Idle"}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       )}
+
+      <style jsx>{`
+        .page {
+          font-family: 'Roboto', 'Segoe UI', sans-serif;
+          background: #f9f9f9;
+          min-height: 100vh;
+          padding: 2rem;
+        }
+        .center-text { text-align: center; margin-top: 2rem; }
+
+        /* Header */
+        .header {
+          display: flex;
+          align-items: center;
+          position: relative;
+          padding-bottom: 1rem;
+        }
+        .back-btn {
+          position: absolute;
+          left: 0;
+          padding: 0.4rem 0.8rem;
+          border-radius: 6px;
+          border: none;
+          background-color: #1a73e8;
+          color: white;
+          cursor: pointer;
+          font-weight: 500;
+          transition: background 0.2s;
+        }
+        .back-btn:hover { background-color: #155cb0; }
+        .header h1 {
+          font-weight: 500;
+          font-size: 2rem;
+          color: #202124;
+          margin: 0 auto;
+          text-align: center;
+        }
+
+        /* Floors */
+        .floors-container {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 1rem;
+          justify-content: center;
+          margin-bottom: 2rem;
+        }
+        .floor-card { text-align: center; }
+        .floor-btn, .room-btn {
+          padding: 0.8rem 1.5rem;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          background: #2c3e50;
+          color: white;
+          transition: background 0.2s;
+        }
+        .floor-btn:hover, .room-btn:hover { background: #34495e; }
+        .floor-btn.selected, .room-btn.selected { background: #1a73e8; }
+        .rooms-container {
+          margin-top: 0.5rem;
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        /* Devices */
+        .devices-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 1rem;
+          max-width: 1000px;
+          margin: 0 auto;
+        }
+        .device-card {
+          background: white;
+          padding: 1rem 1.5rem;
+          border-radius: 12px;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+          transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .device-card:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+        }
+        .device-header { display: flex; align-items: center; gap: 0.5rem; font-weight: 500; margin-bottom: 0.8rem; }
+        .device-icon { font-size: 1.3rem; }
+        .device-type { font-weight: 400; color: #5f6368; }
+        .device-status { margin-top: 0.4rem; }
+        .on { color: #27ae60; }
+        .off { color: #e74c3c; }
+        .thermostat { margin-top: 0.5rem; padding: 0.4rem; background: #f1f3f4; border-radius: 8px; }
+        .doorbell img { margin-top: 0.5rem; width: 100%; max-width: 220px; border-radius: 8px; border: 1px solid #ccc; }
+        .alarm { margin-top: 0.5rem; font-weight: 500; color: gray; }
+        .alarm.triggered { color: #e74c3c; }
+      `}</style>
     </div>
   );
 }
