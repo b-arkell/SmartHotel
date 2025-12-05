@@ -16,7 +16,6 @@ export default function GuestHub() {
       const devices = await fetchRoomDevices();
       setRoom({ name: `Room ${roomId}`, devices });
     };
-
     loadDevices();
   }, [roomId, fetchRoomDevices]);
 
@@ -26,12 +25,13 @@ export default function GuestHub() {
     const interval = setInterval(async () => {
       const devices = await fetchRoomDevices();
       setRoom({ name: `Room ${roomId}`, devices });
-    }, 10000); // backend updates every 10 seconds
+    }, 10000);
 
     return () => clearInterval(interval);
   }, [roomId, fetchRoomDevices]);
 
   const handleCommand = async (deviceId, command) => {
+    if (!roomId) return;
     const success = await sendCommand(roomId, deviceId, command);
     if (success) {
       const devices = await fetchRoomDevices();
@@ -39,308 +39,282 @@ export default function GuestHub() {
     }
   };
 
-  if (!roomId) return <p>Error: No valid room selected.</p>;
-  if (loading) return <p>Loading room data...</p>;
-  if (error) return <p>Error: {error}</p>;
-  if (!room) return <p>No room data available.</p>;
+  if (!roomId) return <p className="center-text">Error: No valid room selected.</p>;
+  if (loading) return <p className="center-text">Loading room data...</p>;
+  if (error) return <p className="center-text error-text">Error: {error}</p>;
+
+  const getDeviceIcon = (device) => {
+    switch (device.type) {
+      case "Light": return "💡";
+      case "Thermostat": return "🌡️";
+      case "Doorbell": return "🔔";
+      case "Alarm": return "🚨";
+      default: return "⚙️";
+    }
+  };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        padding: "2rem",
-        backgroundColor: "#f5f5f5",
-        fontFamily: "Segoe UI, sans-serif",
-      }}
-    >
-      <h1
-        style={{
-          textAlign: "center",
-          fontSize: "2.5rem",
-          fontWeight: "600",
-          marginBottom: "2rem",
-          color: "#2c3e50",
-        }}
-      >
-        Welcome to {room.name}
-      </h1>
-
-      <div
-        style={{
-          maxWidth: "600px",
-          margin: "0 auto",
-          backgroundColor: "#ffffff",
-          padding: "1.5rem",
-          borderRadius: "6px",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-        }}
-      >
-        <h2
-          style={{ marginBottom: "1rem", fontSize: "1.5rem", color: "#34495e" }}
+    <div className="page">
+      {/* Header */}
+      <header className="header">
+        <button
+          onClick={() => window.history.back()}
+          className="back-btn"
         >
-          Your Devices
-        </h2>
-        <ul style={{ listStyle: "none", padding: 0 }}>
-          {room.devices.map((device) => (
-            <li
-              key={device.id}
-              style={{
-                padding: "0.75rem 1rem",
-                borderBottom: "1px solid #ddd",
-                fontSize: "1.1rem",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <div>
-                <strong>{device.name}</strong> ({device.type})
-                {/* Light Controls */}
-                {device.isOn !== undefined && (
-                  <span style={{ marginLeft: "1rem" }}>
-                    <button
-                      onClick={() => handleCommand(device.id, "TurnOn")}
-                      style={{ marginRight: "0.5rem" }}
-                    >
-                      On
-                    </button>
-                    <button onClick={() => handleCommand(device.id, "TurnOff")}>
-                      Off
-                    </button>
-                    <span style={{ marginLeft: "0.5rem" }}>
-                      {device.isOn ? "💡" : "🔌"}
-                    </span>
-                  </span>
-                )}
-                {/* Thermostat Controls */}
-                {device.targetTemperature !== undefined && (
-                  <div style={{ marginTop: "0.5rem" }}>
-                    {/* Current Temperature */}
-                    <div style={{ marginBottom: "0.25rem", fontWeight: "500" }}>
-                      Current Temperature:{" "}
-                      <span style={{ fontWeight: "bold" }}>
-                        {device.currentTemperature ?? "Loading"}°C
-                      </span>
-                    </div>
+          ← Back
+        </button>
+        <h1>Welcome to {room.name}</h1>
+      </header>
 
-                    {/* Target Temperature Input */}
-                    <label
-                      style={{
-                        display: "block",
-                        marginBottom: "0.25rem",
-                        fontWeight: "500",
-                      }}
-                    >
-                      Target Temperature: {device.targetTemperature}°C
-                    </label>
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.5rem",
-                      }}
-                    >
-                      <input
-                        type="number"
-                        defaultValue={device.targetTemperature}
-                        onBlur={(e) => {
-                          const newTemp = e.target.value;
-                          const currentTemp =
-                            device.targetTemperature?.toString() || "";
-                          if (newTemp && newTemp !== currentTemp) {
-                            handleCommand(
-                              device.id,
-                              `SetTemperature ${newTemp}`
-                            );
-                          }
-                        }}
-                        style={{
-                          width: "80px",
-                          padding: "0.4rem",
-                          border: "1px solid #ccc",
-                          borderRadius: "4px",
-                          fontSize: "1rem",
-                        }}
-                        min="10"
-                        max="30"
-                      />
-                      <span>°C</span>
-                    </div>
-                  </div>
-                )}
-                {/* HVAC Mode */}
-                {device.mode !== undefined && (
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: "0.5rem",
-                      marginTop: "0.5rem",
+      {/* Devices Grid */}
+      <main className="devices-grid">
+        {room.devices.map((device) => (
+          <div key={device.id} className="device-card">
+            <div className="device-header">
+              <span className="device-icon">{getDeviceIcon(device)}</span>
+              <strong>{device.name}</strong> <span className="device-type">({device.type})</span>
+            </div>
+
+            {/* Light Controls */}
+            {device.isOn !== undefined && (
+              <div className="device-controls">
+                <button
+                  className={`btn ${device.isOn ? "active" : ""}`}
+                  onClick={() => handleCommand(device.id, "TurnOn")}
+                >
+                  On
+                </button>
+                <button
+                  className={`btn ${!device.isOn ? "active" : ""}`}
+                  onClick={() => handleCommand(device.id, "TurnOff")}
+                >
+                  Off
+                </button>
+                <span className="status-icon">{device.isOn ? "💡" : "🔌"}</span>
+              </div>
+            )}
+
+            {/* Thermostat */}
+            {device.targetTemperature !== undefined && (
+              <div className="thermostat">
+                <div>Current: {device.currentTemperature ?? "--"}°C</div>
+                <div className="temp-input">
+                  <input
+                    type="number"
+                    defaultValue={device.targetTemperature}
+                    onBlur={(e) => {
+                      const newTemp = e.target.value;
+                      if (newTemp !== device.targetTemperature.toString())
+                        handleCommand(device.id, `SetTemperature ${newTemp}`);
                     }}
-                  >
-                    <button
-                      onClick={() => handleCommand(device.id, "SetMode 0")}
-                      style={{
-                        padding: "0.4rem 0.8rem",
-                        backgroundColor:
-                          device.mode === 0 ? "#3498db" : "#ecf0f1",
-                        color: device.mode === 0 ? "white" : "black",
-                        border: "1px solid #ccc",
-                        borderRadius: "4px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      Fan
-                    </button>
+                    min="10"
+                    max="30"
+                  />
+                  °C
+                </div>
+              </div>
+            )}
 
-                    <button
-                      onClick={() => handleCommand(device.id, "SetMode 1")}
-                      style={{
-                        padding: "0.4rem 0.8rem",
-                        backgroundColor:
-                          device.mode === 1 ? "#3498db" : "#ecf0f1",
-                        color: device.mode === 1 ? "white" : "black",
-                        border: "1px solid #ccc",
-                        borderRadius: "4px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      Cool
-                    </button>
+            {/* Mode Controls */}
+            {device.mode !== undefined && (
+              <div className="mode-controls">
+                <span>Mode:</span>
+                <button className={device.mode === 0 ? "selected" : ""} onClick={() => handleCommand(device.id, "SetMode 0")}>Fan</button>
+                <button className={device.mode === 1 ? "selected" : ""} onClick={() => handleCommand(device.id, "SetMode 1")}>Cool ❄️</button>
+                <button className={device.mode === 2 ? "selected" : ""} onClick={() => handleCommand(device.id, "SetMode 2")}>Heat 🔥</button>
+              </div>
+            )}
 
-                    <button
-                      onClick={() => handleCommand(device.id, "SetMode 2")}
-                      style={{
-                        padding: "0.4rem 0.8rem",
-                        backgroundColor:
-                          device.mode === 2 ? "#3498db" : "#ecf0f1",
-                        color: device.mode === 2 ? "white" : "black",
-                        border: "1px solid #ccc",
-                        borderRadius: "4px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      Heat
-                    </button>
-                  </div>
-                )}
-                {/* HVAC Fan Speed */}
-                {device.fanSpeed !== undefined && (
-                  <select
-                    value={device.fanSpeed}
-                    onChange={(e) =>
-                      handleCommand(device.id, `SetFanSpeed ${e.target.value}`)
-                    }
-                    style={{ marginLeft: "0.5rem" }}
-                  >
-                    <option value={1}>Low</option>
-                    <option value={2}>Medium</option>
-                    <option value={3}>High</option>
-                  </select>
-                )}
-                {/* Doorbell */}
-                {device.type === "Doorbell" && (
-                  <div style={{ marginTop: "1rem" }}>
-                    <div style={{ fontWeight: "bold", marginBottom: "0.5rem" }}>
-                      Motion Detected:{" "}
-                      {device.isMotionDetected ? "🚨 YES" : "No"}
-                    </div>
+            {/* Fan Speed */}
+            {device.fanSpeed !== undefined && (
+              <div className="fan-speed">
+                <span>Fan Speed:</span>
+                <select
+                  value={device.fanSpeed}
+                  onChange={(e) => handleCommand(device.id, `SetFanSpeed ${e.target.value}`)}
+                >
+                  <option value={1}>Low</option>
+                  <option value={2}>Medium</option>
+                  <option value={3}>High</option>
+                </select>
+              </div>
+            )}
 
-                    <button
-                      onClick={() => {
-                        const imageUrl = `${process.env.REACT_APP_API_URL}/${device.currentImage}`;
-
-                        window.open(imageUrl, "_blank");
-                      }}
-                      style={{
-                        padding: "0.5rem 1rem",
-                        cursor: "pointer",
-                        background: "#3498db",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "4px",
-                      }}
-                    >
-                      View Image
-                    </button>
-                  </div>
-                )}
-                {/* Alarm System */}
-                {device.type === "Alarm" && (
-                  <div
-                    style={{
-                      marginTop: "1rem",
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "0.75rem",
-                      alignItems: "flex-start",
-                    }}
-                  >
-                    {/* Alarm Icon */}
-                    <div
-                      style={{
-                        fontSize: "2rem",
-                        fontWeight: "bold",
-                        color: device.isAlarmTriggered ? "red" : "#888",
-                        animation: device.isAlarmTriggered
-                          ? "pulse 1s infinite alternate"
-                          : "none",
-                      }}
-                    >
-                      🔔
-                    </div>
-                    {/* Alarm Label */}
-                    <div
-                      style={{
-                        fontWeight: "bold",
-                        color: device.isAlarmTriggered ? "red" : "gray",
-                      }}
-                    >
-                      {device.isAlarmTriggered
-                        ? "Alarm Trigger!"
-                        : "Alarm Idle"}
-                    </div>
-
-                    {/* Buttons */}
-                    <div style={{ display: "flex", gap: "0.5rem" }}>
-                      {!device.isAlarmTriggered ? (
-                        <button
-                          onClick={() => handleCommand(device.id, "PlayAlarm")}
-                          style={{
-                            padding: "0.4rem 0.8rem",
-                            backgroundColor: "#e74c3c",
-                            color: "white",
-                            border: "1px solid #ccc",
-                            borderRadius: "4px",
-                            cursor: "pointer",
-                          }}
-                        >
-                          Trigger Alarm
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() =>
-                            handleCommand(device.id, "DisarmAlarm")
-                          }
-                          style={{
-                            padding: "0.4rem 0.8rem",
-                            backgroundColor: "#2ecc71",
-                            color: "white",
-                            border: "1px solid #ccc",
-                            borderRadius: "4px",
-                            cursor: "pointer",
-                          }}
-                        >
-                          Disarm Alarm
-                        </button>
-                      )}
-                    </div>
-                  </div>
+            {/* Doorbell */}
+            {device.type === "Doorbell" && (
+              <div className="doorbell">
+                <div>Motion Detected: {device.isMotionDetected ? "🚨 YES" : "No"}</div>
+                {device.currentImage && (
+                  <img src={`${process.env.REACT_APP_API_URL}/${device.currentImage}`} alt="Doorbell" />
                 )}
               </div>
-            </li>
-          ))}
-        </ul>
-      </div>
+            )}
+
+            {/* Alarm */}
+            {device.type === "Alarm" && (
+              <div className={`alarm ${device.isAlarmTriggered ? "triggered" : ""}`}>
+                {device.isAlarmTriggered ? "🚨 Alarm TRIGGERED" : "Alarm Idle"}
+                <div>
+                  {device.isAlarmTriggered ? (
+                    <button onClick={() => handleCommand(device.id, "DisarmAlarm")}>Disarm</button>
+                  ) : (
+                    <button onClick={() => handleCommand(device.id, "PlayAlarm")}>Trigger</button>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </main>
+
+      {/* Styles */}
+      <style jsx>{`
+        .page {
+          font-family: 'Roboto', 'Segoe UI', sans-serif;
+          background: #f9f9f9;
+          min-height: 100vh;
+          padding: 2rem;
+        }
+        .center-text { text-align: center; margin-top: 2rem; }
+        .error-text { color: #e74c3c; }
+
+        /* Header */
+        .header {
+          display: flex;
+          align-items: center;
+          position: relative;
+          padding-bottom: 1rem;
+        }
+        .back-btn {
+          position: absolute;
+          left: 0;
+          padding: 0.4rem 0.8rem;
+          border-radius: 6px;
+          border: none;
+          background-color: #1a73e8;
+          color: white;
+          cursor: pointer;
+          font-weight: 500;
+          transition: background 0.2s;
+        }
+        .back-btn:hover { background-color: #155cb0; }
+        .header h1 {
+          font-weight: 500;
+          font-size: 2rem;
+          color: #202124;
+          margin: 0 auto;
+          text-align: center;
+        }
+
+        .devices-grid {
+          display: grid;
+          gap: 1rem;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          max-width: 1000px;
+          margin: 2rem auto;
+        }
+
+        .device-card {
+          background: white;
+          padding: 1rem 1.5rem;
+          border-radius: 12px;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+          transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .device-card:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+        }
+
+        .device-header {
+          font-size: 1.1rem;
+          font-weight: 500;
+          margin-bottom: 0.8rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+        .device-icon { font-size: 1.3rem; }
+        .device-type { font-weight: 400; color: #5f6368; }
+
+        .device-controls {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          margin-bottom: 0.5rem;
+        }
+        .btn {
+          padding: 0.4rem 0.8rem;
+          border: none;
+          border-radius: 4px;
+          background: #e0e0e0;
+          cursor: pointer;
+          transition: background 0.2s;
+        }
+        .btn.active { background: #1a73e8; color: white; }
+        .btn:hover { background: #cfd8dc; }
+
+        .status-icon { margin-left: 0.5rem; }
+
+        .thermostat {
+          margin-top: 0.5rem;
+          padding: 0.5rem;
+          background: #f1f3f4;
+          border-radius: 8px;
+        }
+        .temp-input { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.25rem; }
+        input[type='number'] {
+          width: 60px;
+          padding: 0.3rem;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+        }
+
+        .mode-controls {
+          margin-top: 0.5rem;
+          display: flex;
+          gap: 0.5rem;
+          align-items: center;
+        }
+        .mode-controls button {
+          border-radius: 4px;
+          border: none;
+          padding: 0.3rem 0.6rem;
+          cursor: pointer;
+          background: #e0e0e0;
+          transition: background 0.2s;
+        }
+        .mode-controls button.selected { background: #1a73e8; color: white; }
+        .mode-controls button:hover { background: #cfd8dc; }
+
+        .fan-speed { margin-top: 0.25rem; display: flex; align-items: center; gap: 0.5rem; }
+
+        .doorbell img {
+          margin-top: 0.5rem;
+          width: 100%;
+          max-width: 220px;
+          border-radius: 8px;
+          border: 1px solid #ccc;
+        }
+
+        .alarm {
+          margin-top: 0.5rem;
+          font-weight: 500;
+          color: gray;
+        }
+        .alarm.triggered { color: #e74c3c; }
+        .alarm button {
+          margin-top: 0.25rem;
+          padding: 0.3rem 0.6rem;
+          border-radius: 4px;
+          border: none;
+          cursor: pointer;
+          color: white;
+          background: #e74c3c;
+          transition: background 0.2s;
+        }
+        .alarm button:hover { background: #c0392b; }
+      `}</style>
     </div>
   );
 }

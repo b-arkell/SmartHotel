@@ -29,7 +29,13 @@ namespace Backend.Models
             Sensor = new MotionSensor(motionFileName);
             currentImage = IdleImagePath;
         }
-        
+        // Needed for testing, takes a mock sensor
+        public SmartDoorbell(MotionSensor sensor)
+        {
+            Sensor = sensor;
+            currentImage = IdleImagePath;
+        }
+
         public void UpdateFromFile()
         {
             Sensor.GetNextMotionValue();

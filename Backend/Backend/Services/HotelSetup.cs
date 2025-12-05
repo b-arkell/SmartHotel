@@ -34,7 +34,8 @@ namespace Backend.Services
                                 {
                                     new Light { Id = 1, Name = "Ceiling Light" },
                                     new Thermostat("default.txt") { Id = 2, Name = "Thermostat", TargetTemperature = 20},
-                                    new Light {Id = 3, Name = "Lamp"}
+                                    new Light {Id = 3, Name = "Lamp"},
+                                    new HVAC { Id = 38, Name = "HVAC System" }
                                 }
                             },
                             new Room
@@ -63,8 +64,10 @@ namespace Backend.Services
                                 Devices = new List<IDevice>
                                 {
                                     new Light { Id = 7, Name = "Desk Lamp" },
-                                    new SmartDoorbell("default.txt") { Id = 8, Name = "SmartDoorbell" },
-                                    new AlarmSystem("default.txt") {Id = 9, Name = "AlarmSystem"}
+                                    new SmartDoorbell("MotionSensor1.txt") { Id = 8, Name = "SmartDoorbell" },
+                                    new Thermostat("tempSensor1.txt") { Id = 49, Name = "Thermostat", TargetTemperature = 20},
+                                    new AlarmSystem("MotionSensor1.txt") {Id = 9, Name = "AlarmSystem"},
+                                     new HVAC { Id = 39, Name = "HVAC System" }
                                 }
                             },
                              new Room
@@ -75,7 +78,9 @@ namespace Backend.Services
                                 {
                                     new Light { Id = 13, Name = "Desk Lamp" },
                                     new SmartDoorbell("default.txt") { Id = 14, Name = "SmartDoorbell" },
-                                    new AlarmSystem("default.txt") {Id = 15, Name = "AlarmSystem"}
+                                    new AlarmSystem("MotionSensor1.txt") {Id = 15, Name = "AlarmSystem"},
+                                     new Thermostat("tempSensor2.txt") { Id = 50, Name = "Thermostat", TargetTemperature = 20},
+                                     new HVAC { Id = 40, Name = "HVAC System" }
                                 }
                             }
                         }
@@ -94,7 +99,9 @@ namespace Backend.Services
                                 {
                                     new Light { Id = 10, Name = "Desk Lamp" },
                                     new SmartDoorbell("default.txt") { Id = 11, Name = "SmartDoorbell" },
-                                    new AlarmSystem("default.txt") {Id = 12, Name = "AlarmSystem"}
+                                    new AlarmSystem("MotionSensor2.txt") {Id = 12, Name = "AlarmSystem"},
+                                     new Thermostat("tempSensor3.txt") { Id = 51, Name = "Thermostat", TargetTemperature = 20},
+                                    new HVAC { Id = 37, Name = "HVAC System" }
                                 }
                             },
                             new Room
@@ -103,9 +110,109 @@ namespace Backend.Services
                                 Name = "Room 302",
                                 Devices = new List<IDevice>
                                 {
-                                    new Light { Id = 10, Name = "Desk Lamp" },
-                                    new SmartDoorbell("default.txt") { Id = 11, Name = "SmartDoorbell" },
-                                    new AlarmSystem("default.txt") {Id = 12, Name = "AlarmSystem"}
+                                    new Light { Id = 34, Name = "Desk Lamp" },
+                                    new SmartDoorbell("default.txt") { Id = 35, Name = "SmartDoorbell" },
+                                    new AlarmSystem("MotionSensor3.txt") {Id = 36, Name = "AlarmSystem"},
+                                    new Thermostat("tempSensor1.txt") { Id = 52, Name = "Thermostat", TargetTemperature = 20},
+                                    new HVAC { Id = 41, Name = "HVAC System" }
+                                }
+                            }
+                        }
+                    },
+                    new Floor
+                    {
+                        Id = 4,
+                        Name = "Fourth Floor",
+                        Rooms = new List<Room>
+                        {
+                            new Room
+                            {
+                                Id = 401,
+                                Name = "Room 401",
+                                Devices = new List<IDevice>
+                                {
+                                    new Light { Id = 16, Name = "Ceiling Light" },
+                                    new Thermostat("default.txt") { Id = 17, Name = "Thermostat", TargetTemperature = 20},
+                                    new HVAC { Id = 42, Name = "HVAC System" },
+                                    new Light {Id = 18, Name = "Lamp"}
+                                }
+                            },
+                            new Room
+                            {
+                                Id = 402,
+                                Name = "Room 402",
+                                Devices = new List<IDevice>
+                                {
+                                    new Light { Id = 19, Name = "Main Light" },
+                                    new Light { Id = 43, Name = "Desk Lamp" },
+                                    new HVAC { Id = 43, Name = "HVAC System" },
+                                    new AlarmSystem("MotionSensor3.txt") {Id = 48, Name = "AlarmSystem"},
+                                     new Thermostat("tempSensor2.txt") { Id = 53, Name = "Thermostat", TargetTemperature = 20},
+                                    new SmartDoorbell("default.txt") {Id = 21, Name = "SmartDoorbell" }
+                                }
+                            }
+                        }
+                    },
+                    new Floor
+                    {
+                        Id = 5,
+                        Name = "Fifth Floor",
+                        Rooms = new List<Room>
+                        {
+                            new Room
+                            {
+                                Id = 501,
+                                Name = "Room 501",
+                                Devices = new List<IDevice>
+                                {
+                                    new Light { Id = 22, Name = "Desk Lamp" },
+                                    new SmartDoorbell("MotionSensor2.txt") { Id = 23, Name = "SmartDoorbell" },
+                                    new AlarmSystem("MotionSensor3.txt") {Id = 24, Name = "AlarmSystem"},
+                                    new HVAC { Id = 44, Name = "HVAC System" }
+                                }
+                            },
+                             new Room
+                            {
+                                Id = 502,
+                                Name = "Room 502",
+                                Devices = new List<IDevice>
+                                {
+                                    new Light { Id = 25, Name = "Desk Lamp" },
+                                    new SmartDoorbell("MotionSensor3.txt") { Id = 26, Name = "SmartDoorbell" },
+                                    new AlarmSystem("MotionSensor2.txt") {Id = 27, Name = "AlarmSystem"},
+                                    new HVAC { Id = 45, Name = "HVAC System" }
+                                }
+                            }
+                        }
+                    },
+                    new Floor
+                    {
+                        Id = 6,
+                        Name = "Sixth Floor",
+                        Rooms = new List<Room>
+                        {
+                            new Room
+                            {
+                                Id = 601,
+                                Name = "Room 601",
+                                Devices = new List<IDevice>
+                                {
+                                    new Light { Id = 28, Name = "Desk Lamp" },
+                                    new SmartDoorbell("MotionSensor1.txt") { Id = 29, Name = "SmartDoorbell" },
+                                    new AlarmSystem("MotionSensor2.txt") {Id = 30, Name = "AlarmSystem"},
+                                    new HVAC { Id = 46, Name = "HVAC System" }
+                                }
+                            },
+                            new Room
+                            {
+                                Id = 602,
+                                Name = "Room 602",
+                                Devices = new List<IDevice>
+                                {
+                                    new Light { Id = 31, Name = "Desk Lamp" },
+                                    new SmartDoorbell("MotionSensor3.txt") { Id = 32, Name = "SmartDoorbell" },
+                                    new AlarmSystem("MotionSensor1.txt") {Id = 33, Name = "AlarmSystem"},
+                                    new HVAC { Id = 47, Name = "HVAC System" }
                                 }
                             }
                         }
