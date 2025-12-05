@@ -21,7 +21,7 @@ export default function StartScreen() {
       
       {/* Header */}
       <header style={{ borderBottom: "1px solid #ddd", padding: "1rem" }}>
-        <h2 style={{ margin: 0 }}>Hotel Hub</h2>
+        <h2 style={{ margin: 0 }}>Hotel Login</h2>
       </header>
 
       {/* Main Content */}
@@ -42,7 +42,7 @@ export default function StartScreen() {
                 cursor: "pointer"
             }}>
               <Link to="/hotel" style={{ textDecoration: "none", color: "inherit" }}>
-                <h3 style={{ marginBottom: "0.5rem" }}>Hotel Hub</h3>
+                <h3 style={{ marginBottom: "0.5rem" }}>Admin Hub</h3>
                 <p style={{ fontSize: "0.9rem", color: "#666", marginBottom: "1rem" }}>
                   Manage floors, rooms & devices
                 </p>
@@ -55,7 +55,7 @@ export default function StartScreen() {
                   borderRadius: "5px",
                   cursor: "pointer"
                 }}>
-                  Access Hotel Hub →
+                  Access Admin Hub →
                 </button>
               </Link>
             </div>
