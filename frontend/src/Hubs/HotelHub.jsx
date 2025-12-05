@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
+// HotelHub.jsx
+import React, { useEffect, useState } from "react";
 import { useRoomApi } from "../hooks/useRoomApi";
+import { Link } from "react-router-dom";
 
 export default function HotelHub() {
   const [hotel, setHotel] = useState(null);
@@ -13,16 +15,15 @@ export default function HotelHub() {
   useEffect(() => {
     const storedFloor = sessionStorage.getItem("selectedFloorId");
     const storedRoom = sessionStorage.getItem("selectedRoomId");
-    if (storedFloor && storedRoom) {
-      setSelectedFloorId(parseInt(storedFloor));
-      setSelectedRoomId(parseInt(storedRoom));
-    }
+
+    if (storedFloor) setSelectedFloorId(parseInt(storedFloor));
+    if (storedRoom) setSelectedRoomId(parseInt(storedRoom));
   }, []);
 
   useEffect(() => {
     const loadHotel = async () => {
       try {
-        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/hotel`);
+        const res = await fetch(`${process.env.REACT_APP_API_URL || "http://localhost:5000"}/api/hotel`);
         if (!res.ok) throw new Error("Failed to fetch hotel data");
         const data = await res.json();
         setHotel(data);
@@ -41,128 +42,192 @@ export default function HotelHub() {
 
     const loadDevices = async () => {
       const devices = await fetchRoomDevices();
-      console.log("Fetched devices:", devices);
-      setRoomDevices(devices);
+      setRoomDevices(devices || []);
     };
 
     loadDevices();
   }, [selectedRoomId, fetchRoomDevices]);
 
-  // To match the floor obj to the selected + find room obj in selected floor
   const selectedFloor = hotel?.floors.find(f => f.id === selectedFloorId);
-  const selectedRoom = selectedFloor?.rooms.find(r => r.id === selectedRoomId)
+  const selectedRoom = selectedFloor?.rooms.find(r => r.id === selectedRoomId);
 
-  if (loadingHotel) return <p>Loading device...</p>;
-  if (!hotel || !Array.isArray(hotel.floors) || hotel.floors.length === 0) {
-    return <p>No hotel data available.</p>; // prevents crashes
+  // ---- UI STYLES ----
+  const styles = {
+    page: {
+      minHeight: "100vh",
+      background: "#f7f9fc",
+      padding: "2rem",
+      fontFamily: "Arial, Helvetica, sans-serif",
+    },
+    container: {
+      maxWidth: "900px",
+      margin: "0 auto",
+      background: "#fff",
+      padding: "2rem",
+      borderRadius: "10px",
+      boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+    },
+    heading: {
+      textAlign: "center",
+      fontSize: "2.5rem",
+      marginBottom: "1.5rem",
+      fontWeight: 600,
+    },
+    button: {
+      padding: "0.75rem 1.5rem",
+      background: "#2c3e50",
+      color: "#fff",
+      border: "none",
+      borderRadius: "6px",
+      cursor: "pointer",
+      transition: "0.2s",
+    },
+    activeButton: {
+      padding: "0.75rem 1.5rem",
+      background: "#1abc9c",
+      color: "#fff",
+      border: "none",
+      borderRadius: "6px",
+      cursor: "pointer",
+      transition: "0.2s",
+      fontWeight: 600,
+    },
+    roomButton: active => ({
+      padding: "0.75rem",
+      width: "100%",
+      background: active ? "#3498db" : "#bdc3c7",
+      color: "#fff",
+      border: "none",
+      cursor: "pointer",
+      margin: "5px 0",
+      borderRadius: "4px",
+    }),
+    status: isOff => ({
+      color: isOff ? "#e74c3c" : "#27ae60",
+      fontWeight: 600,
+    }),
+    card: {
+      marginTop: "2rem",
+      background: "#fff",
+      padding: "1.5rem",
+      borderRadius: "8px",
+      border: "1px solid #e5e7eb",
+    },
+    backLink: {
+      textDecoration: "none",
+      fontSize: "1rem",
+      color: "#555",
+      display: "inline-block",
+      marginBottom: "1rem",
+    },
+  };
+
+  // ------- Loading UI -------
+  if (loadingHotel) {
+    return (
+      <div style={styles.page}>
+        <div style={{ textAlign: "center", marginTop: "5rem" }}>Loading hotel data...</div>
+      </div>
+    );
+  }
+
+  if (!hotel) {
+    return (
+      <div style={styles.page}>
+        <div style={styles.container}>
+          <p style={{ textAlign: "center" }}>No hotel data found.</p>
+          <Link to="/" style={styles.backLink}>⬅ Back</Link>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div style={{ minHeight: "100vh", padding: "2rem", backgroundColor: "#f5f5f5" }}>
-      <h1 style={{ textAlign: "center", fontSize: "3rem", marginBottom: "2rem" }}>
-        {hotel.name} Hub
-      </h1>
+    <div style={styles.page}>
+      <div style={styles.container}>
+        
+        <Link to="/" style={styles.backLink}>⬅ Back</Link>
 
-      {/* Floor Selection */}
-      <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap" }}>
-        {hotel.floors.map(floor => (
-          <div key={floor.id}>
+        <h1 style={styles.heading}>{hotel.name} Hub</h1>
+
+        {/* Floor selection */}
+        <div style={{ textAlign: "center", marginBottom: "2rem" }}>
+          {hotel.floors.map(floor => (
             <button
+              key={floor.id}
+              style={selectedFloorId === floor.id ? styles.activeButton : styles.button}
               onClick={() => {
                 setSelectedFloorId(floor.id);
                 setSelectedRoomId(null);
                 setRoomDevices([]);
-              }}
-              style={{
-                padding: "1rem 2rem",
-                backgroundColor: "#2c3e50",
-                color: "#fff",
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer"
+                sessionStorage.setItem("selectedFloorId", floor.id.toString());
               }}
             >
               {floor.name}
             </button>
+          ))}
+        </div>
 
-            {selectedFloorId === floor.id && (
-              <div style={{ marginTop: "0.5rem" }}>
-                {floor.rooms.map(room => (
-                  <button
-                    key={room.id}
-                    onClick={() => setSelectedRoomId(room.id)}
-                    style={{
-                      display: "block",
-                      width: "100%",
-                      padding: "0.75rem 1.5rem",
-                      backgroundColor: selectedRoomId === room.id ? "#34495e" : "#7f8c8d",
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: "4px",
-                      margin: "0.25rem auto",
-                      cursor: "pointer"
-                    }}
-                  >
-                    {room.name}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+        {/* Room selection */}
+        {selectedFloor && (
+          <>
+            <h2 style={{ textAlign: "center", marginBottom: "1rem" }}>
+              Select Room on {selectedFloor.name}
+            </h2>
 
-      {/* Room Devices */}
-      {selectedRoom && (
-        <div
-          style={{
-            marginTop: "2rem",
-            padding: "1.5rem",
-            backgroundColor: "#fff",
-            borderRadius: "6px",
-            maxWidth: "700px",
-            margin: "2rem auto"
-          }}
-        >
-          <h2 style={{ textAlign: "center", marginBottom: "1rem" }}>
-            Devices in {selectedRoom.name}
-          </h2>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px,1fr))", gap: "10px" }}>
+              {selectedFloor.rooms.map(room => (
+                <button
+                  key={room.id}
+                  style={styles.roomButton(selectedRoomId === room.id)}
+                  onClick={() => {
+                    setSelectedRoomId(room.id);
+                    sessionStorage.setItem("selectedRoomId", room.id.toString());
+                  }}
+                >
+                  {room.name}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
 
-          {loadingDevices && <p>Loading devices...</p>}
-          {error && <p>Error: {error}</p>}
+        {/* Devices */}
+        {selectedRoom && (
+          <div style={styles.card}>
+            <h2 style={{ textAlign: "center", marginBottom: "1rem" }}>
+              Devices in {selectedRoom.name}
+            </h2>
 
-          {!loadingDevices && !error && (
-            <ul style={{ listStyle: "none", padding: 0 }}>
-              {roomDevices.map(device => {
-                const offStates = ["Off", "Muted", "Inactive"];
-                return (
-                  <li
-                    key={device.id}
-                    style={{
-                      padding: "0.75rem 1rem",
-                      borderBottom: "1px solid #ddd",
+            {loadingDevices && <p>Loading devices...</p>}
+            {error && <p style={{ color: "red" }}>Error: {error}</p>}
+
+            {!loadingDevices && !error && (
+              <ul style={{ listStyle: "none", padding: 0 }}>
+                {roomDevices.map(device => {
+                  const isOff = ["Off", "Muted", "Inactive"].includes(device.status);
+                  return (
+                    <li key={device.id} style={{
+                      padding: "10px",
+                      borderBottom: "1px solid #eee",
                       display: "flex",
                       justifyContent: "space-between"
-                    }}
-                  >
-                    <span>
-                      <strong>{device.name}</strong> ({device.type})
-                    </span>
-                    <span
-                      style={{
-                        color: offStates.includes(device.status) ? "#e74c3c" : "#27ae60",
-                        fontWeight: "600"
-                      }}
-                    >
-                      {device.status}
-                    </span>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </div>
-      )}
+                    }}>
+                      <span>
+                        <strong>{device.name}</strong> ({device.type})
+                      </span>
+
+                      <span style={styles.status(isOff)}>
+                        {device.status}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
