@@ -1,7 +1,5 @@
-// HotelHub.jsx
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRoomApi } from "../hooks/useRoomApi";
-import { Link } from "react-router-dom";
 
 export default function HotelHub() {
   const [hotel, setHotel] = useState(null);
@@ -15,219 +13,169 @@ export default function HotelHub() {
   useEffect(() => {
     const storedFloor = sessionStorage.getItem("selectedFloorId");
     const storedRoom = sessionStorage.getItem("selectedRoomId");
-
-    if (storedFloor) setSelectedFloorId(parseInt(storedFloor));
-    if (storedRoom) setSelectedRoomId(parseInt(storedRoom));
+    if (storedFloor && storedRoom) {
+      setSelectedFloorId(parseInt(storedFloor));
+      setSelectedRoomId(parseInt(storedRoom));
+    }
   }, []);
 
   useEffect(() => {
     const loadHotel = async () => {
       try {
-        const res = await fetch(`${process.env.REACT_APP_API_URL || "http://localhost:5000"}/api/hotel`);
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/hotel`);
         if (!res.ok) throw new Error("Failed to fetch hotel data");
         const data = await res.json();
         setHotel(data);
-      } catch (error) {
-        console.error("Error fetching hotel data:", error);
+      } catch (err) {
+        console.error(err);
       } finally {
         setLoadingHotel(false);
       }
     };
-
     loadHotel();
   }, []);
 
   useEffect(() => {
     if (!selectedRoomId) return;
-
     const loadDevices = async () => {
       const devices = await fetchRoomDevices();
-      setRoomDevices(devices || []);
+      setRoomDevices(devices);
     };
-
     loadDevices();
   }, [selectedRoomId, fetchRoomDevices]);
 
   const selectedFloor = hotel?.floors.find(f => f.id === selectedFloorId);
   const selectedRoom = selectedFloor?.rooms.find(r => r.id === selectedRoomId);
 
-  // ---- UI STYLES ----
-  const styles = {
-    page: {
-      minHeight: "100vh",
-      background: "#f7f9fc",
-      padding: "2rem",
-      fontFamily: "Arial, Helvetica, sans-serif",
-    },
-    container: {
-      maxWidth: "900px",
-      margin: "0 auto",
-      background: "#fff",
-      padding: "2rem",
-      borderRadius: "10px",
-      boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-    },
-    heading: {
-      textAlign: "center",
-      fontSize: "2.5rem",
-      marginBottom: "1.5rem",
-      fontWeight: 600,
-    },
-    button: {
-      padding: "0.75rem 1.5rem",
-      background: "#2c3e50",
-      color: "#fff",
-      border: "none",
-      borderRadius: "6px",
-      cursor: "pointer",
-      transition: "0.2s",
-    },
-    activeButton: {
-      padding: "0.75rem 1.5rem",
-      background: "#1abc9c",
-      color: "#fff",
-      border: "none",
-      borderRadius: "6px",
-      cursor: "pointer",
-      transition: "0.2s",
-      fontWeight: 600,
-    },
-    roomButton: active => ({
-      padding: "0.75rem",
-      width: "100%",
-      background: active ? "#3498db" : "#bdc3c7",
-      color: "#fff",
-      border: "none",
-      cursor: "pointer",
-      margin: "5px 0",
-      borderRadius: "4px",
-    }),
-    status: isOff => ({
-      color: isOff ? "#e74c3c" : "#27ae60",
-      fontWeight: 600,
-    }),
-    card: {
-      marginTop: "2rem",
-      background: "#fff",
-      padding: "1.5rem",
-      borderRadius: "8px",
-      border: "1px solid #e5e7eb",
-    },
-    backLink: {
-      textDecoration: "none",
-      fontSize: "1rem",
-      color: "#555",
-      display: "inline-block",
-      marginBottom: "1rem",
-    },
-  };
-
-  // ------- Loading UI -------
   if (loadingHotel) {
-    return (
-      <div style={styles.page}>
-        <div style={{ textAlign: "center", marginTop: "5rem" }}>Loading hotel data...</div>
-      </div>
-    );
+    return <p style={{ textAlign: "center", marginTop: "2rem" }}>Loading hotel data...</p>;
   }
-
-  if (!hotel) {
-    return (
-      <div style={styles.page}>
-        <div style={styles.container}>
-          <p style={{ textAlign: "center" }}>No hotel data found.</p>
-          <Link to="/" style={styles.backLink}>⬅ Back</Link>
-        </div>
-      </div>
-    );
+  if (!hotel?.floors?.length) {
+    return <p style={{ textAlign: "center", marginTop: "2rem" }}>No hotel data available.</p>;
   }
 
   return (
-    <div style={styles.page}>
-      <div style={styles.container}>
-        
-        <Link to="/" style={styles.backLink}>⬅ Back</Link>
+    <div style={{ minHeight: "100vh", backgroundColor: "#f5f5f5" }}>
+      {/* Header */}
+      <header style={{
+        position: "sticky",
+        top: 0,
+        backgroundColor: "rgba(255,255,255,0.95)",
+        backdropFilter: "blur(6px)",
+        padding: "1rem 2rem",
+        borderBottom: "1px solid #ddd",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 50
+      }}>
+        <h1 style={{ fontSize: "2rem", margin: 0 }}>{hotel.name} Hub</h1>
+      </header>
 
-        <h1 style={styles.heading}>{hotel.name} Hub</h1>
+      <main style={{ maxWidth: "1200px", margin: "2rem auto", padding: "0 1rem" }}>
+        {/* Floor Selection */}
+        <section style={{ marginBottom: "2rem" }}>
+          <h2 style={{ fontSize: "1.2rem", marginBottom: "1rem" }}>Select Floor</h2>
+          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+            {hotel.floors.map(floor => (
+              <button
+                key={floor.id}
+                onClick={() => {
+                  setSelectedFloorId(floor.id);
+                  setSelectedRoomId(null);
+                  setRoomDevices([]);
+                  sessionStorage.setItem("selectedFloorId", floor.id);
+                }}
+                style={{
+                  padding: "0.75rem 1.25rem",
+                  borderRadius: "6px",
+                  border: "none",
+                  cursor: "pointer",
+                  backgroundColor: selectedFloorId === floor.id ? "#3498db" : "#ecf0f1",
+                  color: selectedFloorId === floor.id ? "#fff" : "#2c3e50"
+                }}
+              >
+                {floor.name}
+              </button>
+            ))}
+          </div>
+        </section>
 
-        {/* Floor selection */}
-        <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-          {hotel.floors.map(floor => (
-            <button
-              key={floor.id}
-              style={selectedFloorId === floor.id ? styles.activeButton : styles.button}
-              onClick={() => {
-                setSelectedFloorId(floor.id);
-                setSelectedRoomId(null);
-                setRoomDevices([]);
-                sessionStorage.setItem("selectedFloorId", floor.id.toString());
-              }}
-            >
-              {floor.name}
-            </button>
-          ))}
-        </div>
-
-        {/* Room selection */}
+        {/* Room Selection */}
         {selectedFloor && (
-          <>
-            <h2 style={{ textAlign: "center", marginBottom: "1rem" }}>
-              Select Room on {selectedFloor.name}
-            </h2>
-
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px,1fr))", gap: "10px" }}>
+          <section style={{ marginBottom: "2rem" }}>
+            <h2 style={{ fontSize: "1.2rem", marginBottom: "1rem" }}>Select Room</h2>
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
+              gap: "1rem"
+            }}>
               {selectedFloor.rooms.map(room => (
-                <button
+                <div
                   key={room.id}
-                  style={styles.roomButton(selectedRoomId === room.id)}
                   onClick={() => {
                     setSelectedRoomId(room.id);
-                    sessionStorage.setItem("selectedRoomId", room.id.toString());
+                    sessionStorage.setItem("selectedRoomId", room.id);
+                  }}
+                  style={{
+                    padding: "1rem",
+                    textAlign: "center",
+                    borderRadius: "6px",
+                    border: selectedRoomId === room.id ? "2px solid #3498db" : "1px solid #ddd",
+                    cursor: "pointer",
+                    backgroundColor: selectedRoomId === room.id ? "#d6eaf8" : "#fff"
                   }}
                 >
                   {room.name}
-                </button>
+                </div>
               ))}
             </div>
-          </>
+          </section>
         )}
 
-        {/* Devices */}
+        {/* Room Devices */}
         {selectedRoom && (
-          <div style={styles.card}>
-            <h2 style={{ textAlign: "center", marginBottom: "1rem" }}>
+          <section>
+            <h2 style={{ fontSize: "1.2rem", marginBottom: "1rem" }}>
               Devices in {selectedRoom.name}
             </h2>
-
-            {loadingDevices && <p>Loading devices...</p>}
-            {error && <p style={{ color: "red" }}>Error: {error}</p>}
-
-            {!loadingDevices && !error && (
+            <div style={{
+              backgroundColor: "#fff",
+              padding: "1rem",
+              borderRadius: "6px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
+            }}>
+              {loadingDevices && <p>Loading devices...</p>}
+              {error && <p style={{ color: "red" }}>Error: {error}</p>}
+              {!loadingDevices && !error && roomDevices.length === 0 && <p>No devices found.</p>}
               <ul style={{ listStyle: "none", padding: 0 }}>
                 {roomDevices.map(device => {
-                  const isOff = ["Off", "Muted", "Inactive"].includes(device.status);
+                  const offStates = ["Off", "Muted", "Inactive"];
+                  const isOff = offStates.includes(device.status || "");
                   return (
                     <li key={device.id} style={{
-                      padding: "10px",
-                      borderBottom: "1px solid #eee",
                       display: "flex",
-                      justifyContent: "space-between"
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      padding: "0.75rem 0",
+                      borderBottom: "1px solid #eee"
                     }}>
-                      <span>
+                      <div>
                         <strong>{device.name}</strong> ({device.type})
-                      </span>
-
-                      <span style={styles.status(isOff)}>
-                        {device.status}
-                      </span>
+                      </div>
+                      {device.isOn !== undefined && (
+                        <span style={{ color: device.isOn ? "#27ae60" : "#e74c3c" }}>
+                          {device.isOn ? "On 💡" : "Off 🔌"}
+                        </span>
+                      )}
                     </li>
                   );
                 })}
               </ul>
-            )}
-          </div>
+            </div>
+          </section>
         )}
-      </div>
+      </main>
     </div>
   );
 }

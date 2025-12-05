@@ -45,7 +45,7 @@ namespace Backend.Services
                                 {
                                     new Light { Id = 4, Name = "Main Light" },
                                     new HVAC { Id = 5, Name = "HVAC System" },
-                                    new SmartDoorbell("default") {Id = 6, Name = "SmartDoorbell" }
+                                    new SmartDoorbell("default.txt") {Id = 6, Name = "SmartDoorbell" }
                                 }
                             }
                         }
@@ -63,7 +63,49 @@ namespace Backend.Services
                                 Devices = new List<IDevice>
                                 {
                                     new Light { Id = 7, Name = "Desk Lamp" },
-                                    new SmartDoorbell("default") { Id = 8, Name = "SmartDoorbell" }
+                                    new SmartDoorbell("default.txt") { Id = 8, Name = "SmartDoorbell" },
+                                    new AlarmSystem("default.txt") {Id = 9, Name = "AlarmSystem"}
+                                }
+                            },
+                             new Room
+                            {
+                                Id = 202,
+                                Name = "Room 202",
+                                Devices = new List<IDevice>
+                                {
+                                    new Light { Id = 13, Name = "Desk Lamp" },
+                                    new SmartDoorbell("default.txt") { Id = 14, Name = "SmartDoorbell" },
+                                    new AlarmSystem("default.txt") {Id = 15, Name = "AlarmSystem"}
+                                }
+                            }
+                        }
+                    },
+                    new Floor
+                    {
+                        Id = 3,
+                        Name = "Third Floor",
+                        Rooms = new List<Room>
+                        {
+                            new Room
+                            {
+                                Id = 301,
+                                Name = "Room 301",
+                                Devices = new List<IDevice>
+                                {
+                                    new Light { Id = 10, Name = "Desk Lamp" },
+                                    new SmartDoorbell("default.txt") { Id = 11, Name = "SmartDoorbell" },
+                                    new AlarmSystem("default.txt") {Id = 12, Name = "AlarmSystem"}
+                                }
+                            },
+                            new Room
+                            {
+                                Id = 302,
+                                Name = "Room 302",
+                                Devices = new List<IDevice>
+                                {
+                                    new Light { Id = 10, Name = "Desk Lamp" },
+                                    new SmartDoorbell("default.txt") { Id = 11, Name = "SmartDoorbell" },
+                                    new AlarmSystem("default.txt") {Id = 12, Name = "AlarmSystem"}
                                 }
                             }
                         }
@@ -113,7 +155,7 @@ namespace Backend.Services
 
         public Hotel GetHotel()
         {
-            return  Hotel;
+            return Hotel;
         }
     }
 }
