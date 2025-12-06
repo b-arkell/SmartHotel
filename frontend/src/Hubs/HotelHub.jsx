@@ -8,7 +8,11 @@ export default function HotelHub() {
   const [roomDevices, setRoomDevices] = useState([]);
   const [loadingHotel, setLoadingHotel] = useState(true);
 
-  const { fetchRoomDevices, loading: loadingDevices, error } = useRoomApi(selectedRoomId);
+  const {
+    fetchRoomDevices,
+    loading: loadingDevices,
+    error,
+  } = useRoomApi(selectedRoomId);
 
   useEffect(() => {
     const storedFloor = sessionStorage.getItem("selectedFloorId");
@@ -37,6 +41,7 @@ export default function HotelHub() {
 
   useEffect(() => {
     if (!selectedRoomId) return;
+
     const loadDevices = async () => {
       const devices = await fetchRoomDevices();
       setRoomDevices(devices);
@@ -44,30 +49,46 @@ export default function HotelHub() {
     loadDevices();
   }, [selectedRoomId, fetchRoomDevices]);
 
+  useEffect(() => {
+    if (!selectedRoomId) return;
+
+    const interval = setInterval(async () => {
+      const devices = await fetchRoomDevices();
+      setRoomDevices(devices);
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [selectedRoomId, fetchRoomDevices]);
+
   const selectedFloor = hotel?.floors.find((f) => f.id === selectedFloorId);
-  const selectedRoom = selectedFloor?.rooms.find((r) => r.id === selectedRoomId);
+  const selectedRoom = selectedFloor?.rooms.find(
+    (r) => r.id === selectedRoomId
+  );
 
   const getDeviceIcon = (device) => {
     switch (device.type) {
-      case "Light": return "💡";
-      case "Thermostat": return "🌡️";
-      case "Doorbell": return "🔔";
-      case "Alarm": return "🚨";
-      default: return "⚙️";
+      case "Light":
+        return "💡";
+      case "Thermostat":
+        return "🌡️";
+      case "Doorbell":
+        return "🔔";
+      case "Alarm":
+        return "🚨";
+      default:
+        return "⚙️";
     }
   };
 
   if (loadingHotel) return <p className="center-text">Loading hotel...</p>;
-  if (!hotel || !Array.isArray(hotel.floors) || hotel.floors.length === 0) return <p className="center-text">No hotel data available.</p>;
+  if (!hotel || !Array.isArray(hotel.floors) || hotel.floors.length === 0)
+    return <p className="center-text">No hotel data available.</p>;
 
   return (
     <div className="page">
       {/* Header */}
       <header className="header">
-        <button
-          onClick={() => window.history.back()}
-          className="back-btn"
-        >
+        <button onClick={() => window.history.back()} className="back-btn">
           ← Back
         </button>
         <h1>Admin Hub</h1>
@@ -78,7 +99,9 @@ export default function HotelHub() {
         {hotel.floors.map((floor) => (
           <div key={floor.id} className="floor-card">
             <button
-              className={`floor-btn ${selectedFloorId === floor.id ? "selected" : ""}`}
+              className={`floor-btn ${
+                selectedFloorId === floor.id ? "selected" : ""
+              }`}
               onClick={() => {
                 setSelectedFloorId(floor.id);
                 setSelectedRoomId(null);
@@ -93,7 +116,9 @@ export default function HotelHub() {
                 {floor.rooms.map((room) => (
                   <button
                     key={room.id}
-                    className={`room-btn ${selectedRoomId === room.id ? "selected" : ""}`}
+                    className={`room-btn ${
+                      selectedRoomId === room.id ? "selected" : ""
+                    }`}
                     onClick={() => setSelectedRoomId(room.id)}
                   >
                     {room.name}
@@ -111,65 +136,100 @@ export default function HotelHub() {
           {loadingDevices && <p>Loading devices...</p>}
           {error && <p className="error-text">Error: {error}</p>}
 
-          {!loadingDevices && !error && roomDevices.map((device) => (
-            <div key={device.id} className="device-card">
-              <div className="device-header">
-                <span className="device-icon">{getDeviceIcon(device)}</span>
-                <strong>{device.name}</strong> <span className="device-type">({device.type})</span>
+          {!loadingDevices &&
+            !error &&
+            roomDevices.map((device) => (
+              <div key={device.id} className="device-card">
+                <div className="device-header">
+                  <span className="device-icon">{getDeviceIcon(device)}</span>
+                  <strong>{device.name}</strong>{" "}
+                  <span className="device-type">({device.type})</span>
+                </div>
+
+                {/* Light */}
+                {device.isOn !== undefined && (
+                  <div className="device-status">
+                    <strong>Status:</strong>{" "}
+                    <span className={device.isOn ? "on" : "off"}>
+                      {device.isOn ? "On 💡" : "Off 🔌"}
+                    </span>
+                  </div>
+                )}
+
+                {/* Thermostat */}
+                {device.currentTemperature !== undefined && (
+                  <div className="thermostat">
+                    <div>Current Temp: {device.currentTemperature}°C</div>
+                    <div>Target Temp: {device.targetTemperature}°C</div>
+                  </div>
+                )}
+
+                {/* Doorbell */}
+                {device.type === "Doorbell" && (
+                  <div className="doorbell">
+                    <div>
+                      Motion Detected:{" "}
+                      {device.isMotionDetected ? "🚨 YES" : "No"}
+                    </div>
+                    {device.currentImage && (
+                      <img
+                        src={`${process.env.REACT_APP_API_URL}/${device.currentImage}`}
+                        alt="Doorbell snapshot"
+                      />
+                    )}
+                  </div>
+                )}
+
+                {/* HVAC */}
+                {device.mode !== undefined && (
+                  <div className="device-status">
+                    HVAC Mode:{" "}
+                    {device.mode === 0
+                      ? "Fan"
+                      : device.mode === 1
+                      ? "Cool ❄️"
+                      : "Heat 🔥"}
+                  </div>
+                )}
+
+                {device.fanSpeed !== undefined && (
+                  <div className="device-status">
+                    Fan Speed:{" "}
+                    {device.fanSpeed === 1
+                      ? "Low"
+                      : device.fanSpeed === 2
+                      ? "Medium"
+                      : "High"}
+                  </div>
+                )}
+
+                {device.type === "Alarm" && (
+                  <div
+                    className={`alarm ${
+                      device.isAlarmTriggered ? "triggered" : ""
+                    }`}
+                  >
+                    {device.isAlarmTriggered
+                      ? "🚨 Alarm TRIGGERED"
+                      : "Alarm Idle"}
+                  </div>
+                )}
               </div>
-
-              {/* Light */}
-              {device.isOn !== undefined && (
-                <div className="device-status">
-                  <strong>Status:</strong> <span className={device.isOn ? "on" : "off"}>{device.isOn ? "On 💡" : "Off 🔌"}</span>
-                </div>
-              )}
-
-              {/* Thermostat */}
-              {device.currentTemperature !== undefined && (
-                <div className="thermostat">
-                  <div>Current Temp: {device.currentTemperature}°C</div>
-                  <div>Target Temp: {device.targetTemperature}°C</div>
-                </div>
-              )}
-
-              {/* Doorbell */}
-              {device.type === "Doorbell" && (
-                <div className="doorbell">
-                  <div>Motion Detected: {device.isMotionDetected ? "🚨 YES" : "No"}</div>
-                  {device.currentImage && (
-                    <img src={`${process.env.REACT_APP_API_URL}/${device.currentImage}`} alt="Doorbell snapshot" />
-                  )}
-                </div>
-              )}
-
-              {/* HVAC */}
-              {device.mode !== undefined && (
-                <div className="device-status">HVAC Mode: {device.mode === 0 ? "Fan" : device.mode === 1 ? "Cool ❄️" : "Heat 🔥"}</div>
-              )}
-
-              {device.fanSpeed !== undefined && (
-                <div className="device-status">Fan Speed: {device.fanSpeed === 1 ? "Low" : device.fanSpeed === 2 ? "Medium" : "High"}</div>
-              )}
-
-              {device.type === "Alarm" && (
-                <div className={`alarm ${device.isAlarmTriggered ? "triggered" : ""}`}>
-                  {device.isAlarmTriggered ? "🚨 Alarm TRIGGERED" : "Alarm Idle"}
-                </div>
-              )}
-            </div>
-          ))}
+            ))}
         </div>
       )}
 
       <style jsx>{`
         .page {
-          font-family: 'Roboto', 'Segoe UI', sans-serif;
+          font-family: "Roboto", "Segoe UI", sans-serif;
           background: #f9f9f9;
           min-height: 100vh;
           padding: 2rem;
         }
-        .center-text { text-align: center; margin-top: 2rem; }
+        .center-text {
+          text-align: center;
+          margin-top: 2rem;
+        }
 
         /* Header */
         .header {
@@ -190,7 +250,9 @@ export default function HotelHub() {
           font-weight: 500;
           transition: background 0.2s;
         }
-        .back-btn:hover { background-color: #155cb0; }
+        .back-btn:hover {
+          background-color: #155cb0;
+        }
         .header h1 {
           font-weight: 500;
           font-size: 2rem;
@@ -207,8 +269,11 @@ export default function HotelHub() {
           justify-content: center;
           margin-bottom: 2rem;
         }
-        .floor-card { text-align: center; }
-        .floor-btn, .room-btn {
+        .floor-card {
+          text-align: center;
+        }
+        .floor-btn,
+        .room-btn {
           padding: 0.8rem 1.5rem;
           border: none;
           border-radius: 6px;
@@ -217,8 +282,14 @@ export default function HotelHub() {
           color: white;
           transition: background 0.2s;
         }
-        .floor-btn:hover, .room-btn:hover { background: #34495e; }
-        .floor-btn.selected, .room-btn.selected { background: #1a73e8; }
+        .floor-btn:hover,
+        .room-btn:hover {
+          background: #34495e;
+        }
+        .floor-btn.selected,
+        .room-btn.selected {
+          background: #1a73e8;
+        }
         .rooms-container {
           margin-top: 0.5rem;
           display: flex;
@@ -238,23 +309,57 @@ export default function HotelHub() {
           background: white;
           padding: 1rem 1.5rem;
           border-radius: 12px;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
           transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
         .device-card:hover {
           transform: translateY(-3px);
-          box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
         }
-        .device-header { display: flex; align-items: center; gap: 0.5rem; font-weight: 500; margin-bottom: 0.8rem; }
-        .device-icon { font-size: 1.3rem; }
-        .device-type { font-weight: 400; color: #5f6368; }
-        .device-status { margin-top: 0.4rem; }
-        .on { color: #27ae60; }
-        .off { color: #e74c3c; }
-        .thermostat { margin-top: 0.5rem; padding: 0.4rem; background: #f1f3f4; border-radius: 8px; }
-        .doorbell img { margin-top: 0.5rem; width: 100%; max-width: 220px; border-radius: 8px; border: 1px solid #ccc; }
-        .alarm { margin-top: 0.5rem; font-weight: 500; color: gray; }
-        .alarm.triggered { color: #e74c3c; }
+        .device-header {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-weight: 500;
+          margin-bottom: 0.8rem;
+        }
+        .device-icon {
+          font-size: 1.3rem;
+        }
+        .device-type {
+          font-weight: 400;
+          color: #5f6368;
+        }
+        .device-status {
+          margin-top: 0.4rem;
+        }
+        .on {
+          color: #27ae60;
+        }
+        .off {
+          color: #e74c3c;
+        }
+        .thermostat {
+          margin-top: 0.5rem;
+          padding: 0.4rem;
+          background: #f1f3f4;
+          border-radius: 8px;
+        }
+        .doorbell img {
+          margin-top: 0.5rem;
+          width: 100%;
+          max-width: 220px;
+          border-radius: 8px;
+          border: 1px solid #ccc;
+        }
+        .alarm {
+          margin-top: 0.5rem;
+          font-weight: 500;
+          color: gray;
+        }
+        .alarm.triggered {
+          color: #e74c3c;
+        }
       `}</style>
     </div>
   );

@@ -1,4 +1,5 @@
 using Backend.Models;
+using Backend.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -23,7 +24,13 @@ builder.Services.AddControllers()
 
 
 // Add singleton service for hotel setup
-builder.Services.AddSingleton<Backend.Services.HotelSetup>(); // This will initialize the hotel structure at startup
+builder.Services.AddSingleton<HotelSetup>(sp =>
+{
+    var env = sp.GetRequiredService<IWebHostEnvironment>();
+    return new HotelSetup(env);
+});
+// This will initialize the hotel structure at startup depending on the environment
+
 builder.Services.AddHostedService<SensorUpdateService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

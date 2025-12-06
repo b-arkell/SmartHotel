@@ -32,7 +32,7 @@ namespace Backend.IntegrationTests
 
 
         [TestMethod]
-        public async Task GetDeviceByID_ReturnThermostat() // TODO: add ore getDevices (try all)
+        public async Task GetDeviceByID_ReturnThermostat() 
         {
 
             // Act
@@ -48,7 +48,7 @@ namespace Backend.IntegrationTests
         }
 
         [TestMethod]
-        public async Task GetDeviceByID_ReturnLight() // TODO: change this to different device
+        public async Task GetDeviceByID_ReturnLight() 
         {
 
             // Act
@@ -153,6 +153,92 @@ namespace Backend.IntegrationTests
             Assert.IsTrue(light!.IsOn, "Light should be on after command.");
           
 
+        }
+
+        [TestMethod]
+        public async Task sendCommandToThermostat()
+        {
+
+            // Act
+            var commandContent = new StringContent("\"SetTemperature 22\"", Encoding.UTF8, "application/json");
+            var response = await _client!.PutAsync("/api/Room/101/2/command", commandContent);
+
+            // Assert
+            Assert.IsTrue(response.IsSuccessStatusCode);
+
+
+            // Act
+            var getResponse = await _client!.GetAsync("/api/Room/101/2");
+            var thermostat = await getResponse.Content.ReadFromJsonAsync<Thermostat>();
+
+
+            // Assert
+            Assert.IsNotNull(thermostat);
+            Assert.AreEqual(22, thermostat!.TargetTemperature, "Thermostat should be 22 after command");
+        }
+
+        [TestMethod]
+        public async Task sendCommandToHVACSetModeHeat()
+        {
+
+            // Act
+            var commandContent = new StringContent("\"SetMode 2\"", Encoding.UTF8, "application/json");
+            var response = await _client!.PutAsync("/api/Room/102/5/command", commandContent);
+
+            // Assert
+            Assert.IsTrue(response.IsSuccessStatusCode);
+
+
+            // Act
+            var getResponse = await _client!.GetAsync("/api/Room/102/5");
+            var hvac = await getResponse.Content.ReadFromJsonAsync<HVAC>();
+            HVAC.HVACMode expectedMode = HVAC.HVACMode.Heat;
+
+            // Assert
+            Assert.IsNotNull(hvac);
+            Assert.AreEqual(expectedMode, hvac!.Mode, "HVAC mode should be Heat after command");
+        }
+
+        [TestMethod]
+        public async Task sendCommandToHVACSetFanspeedMedium()
+        {
+
+            // Act
+            var commandContent = new StringContent("\"SetFanSpeed 2\"", Encoding.UTF8, "application/json");
+            var response = await _client!.PutAsync("/api/Room/102/5/command", commandContent);
+
+            // Assert
+            Assert.IsTrue(response.IsSuccessStatusCode);
+
+
+            // Act
+            var getResponse = await _client!.GetAsync("/api/Room/102/5");
+            var hvac = await getResponse.Content.ReadFromJsonAsync<HVAC>();
+            HVAC.FanSpeedLevel expectedSpeed = HVAC.FanSpeedLevel.Medium;
+
+            // Assert
+            Assert.IsNotNull(hvac);
+            Assert.AreEqual(expectedSpeed, hvac!.FanSpeed, "HVAC fan speed should be medium after command");
+        }
+
+        [TestMethod]
+        public async Task sendCommandToAlarmSystemPlayAlarm()
+        {
+
+            // Act
+            var commandContent = new StringContent("\"PlayAlarm\"", Encoding.UTF8, "application/json");
+            var response = await _client!.PutAsync("/api/Room/201/9/command", commandContent);
+
+            // Assert
+            Assert.IsTrue(response.IsSuccessStatusCode);
+
+            // Act
+            var getResponse = await _client!.GetAsync("/api/Room/201/9");
+            var alarmSystem = await getResponse.Content.ReadFromJsonAsync<AlarmSystem>();
+
+            // Assert
+            Assert.IsNotNull(alarmSystem);
+            Assert.IsTrue(alarmSystem!.IsAlarmTriggered, "Alarm should be triggered after command.");
         }
     }
 }

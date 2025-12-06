@@ -7,6 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Mocks\MotionSensor\TestMotionData.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Mocks\MotionSensor\TestMotionData.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
   <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.0" />
 </ItemGroup>
