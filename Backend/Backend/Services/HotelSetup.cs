@@ -8,10 +8,17 @@ namespace Backend.Services
     {
         public Hotel Hotel { get; private set; }
 
-        public HotelSetup()
+        public HotelSetup(IWebHostEnvironment env)
         {
-            // When the backend starts, build the entire hotel structure
-            Hotel = InitializeHotel();
+            if (env.IsEnvironment("IntegrationTests"))
+            {
+                // When the test environment starts, build the test hotel structure
+                Hotel = initializeHotelForTests();
+            }else
+            {
+                // When the backend starts, build the entire hotel structure
+                Hotel = InitializeHotel();
+            }
         }
 
         private Hotel InitializeHotel()
@@ -220,6 +227,69 @@ namespace Backend.Services
                 }
             };
         }
+
+        // test hotel structure for integration tests
+        private Hotel initializeHotelForTests()
+        {
+            return new Hotel
+            {
+                Floors = new List<Floor>
+                {
+                    new Floor
+                    {
+                        Id = 1,
+                        Name = "First Floor",
+                        Rooms = new List<Room>
+                        {
+                            new Room
+                            {
+                                Id = 101,
+                                Name = "Room 101",
+                                Devices = new List<IDevice>
+                                {
+                                    new Light { Id = 1, Name = "Ceiling Light" },
+                                    new Thermostat() { Id = 2, Name = "Thermostat", TargetTemperature = 20},
+                                    new Light {Id = 3, Name = "Lamp"}
+                                }
+                            },
+                            new Room
+                            {
+                                Id = 102,
+                                Name = "Room 102",
+                                Devices = new List<IDevice>
+                                {
+                                    new HVAC { Id = 5, Name = "HVAC System" },
+                                    new SmartDoorbell("default.txt") {Id = 6, Name = "SmartDoorbell" }
+                                }
+                            }
+                        }
+                    },
+                    new Floor
+                    {
+                        Id = 2,
+                        Name = "Second Floor",
+                        Rooms = new List<Room>
+                        {
+                            new Room
+                            {
+                                Id = 201,
+                                Name = "Room 201",
+                                Devices = new List<IDevice>
+                                {
+                                    new AlarmSystem() {Id = 9, Name = "AlarmSystem"},
+                                     new Thermostat() { Id = 49, Name = "Thermostat", TargetTemperature = 20},
+                                     new HVAC { Id = 39, Name = "HVAC System" }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+        }
+
+
+
+
         // helps controllers find rooms and devices
         public object? GetDeviceById(int roomId, int deviceId)
         {

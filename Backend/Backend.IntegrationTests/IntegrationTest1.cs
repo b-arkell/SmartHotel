@@ -32,7 +32,7 @@ namespace Backend.IntegrationTests
 
 
         [TestMethod]
-        public async Task GetDeviceByID_ReturnThermostat() // TODO: add ore getDevices (try all)
+        public async Task GetDeviceByID_ReturnThermostat() 
         {
 
             // Act
@@ -48,7 +48,7 @@ namespace Backend.IntegrationTests
         }
 
         [TestMethod]
-        public async Task GetDeviceByID_ReturnLight() // TODO: change this to different device
+        public async Task GetDeviceByID_ReturnLight() 
         {
 
             // Act

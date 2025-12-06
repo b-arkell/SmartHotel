@@ -29,6 +29,12 @@
   <ItemGroup>
     <Content Remove="Images\idle.jpg" />
     <Content Remove="Images\snif.jpg" />
+    <Content Remove="Mocks\MotionSensor\MotionSensor1.txt" />
+    <Content Remove="Mocks\MotionSensor\MotionSensor2.txt" />
+    <Content Remove="Mocks\MotionSensor\MotionSensor3.txt" />
+    <Content Remove="Mocks\TemperatureSensor\tempSensor1.txt" />
+    <Content Remove="Mocks\TemperatureSensor\tempSensor2.txt" />
+    <Content Remove="Mocks\TemperatureSensor\tempSensor3.txt" />
   </ItemGroup>
 
   <ItemGroup>
