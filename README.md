@@ -11,5 +11,7 @@ Group 6 project 3
 7. Run the command "npm install" to get dependencies
 8. If there is an error, open powershell as an Admin and run "Set-ExecutionPolicy RemoteSigned"
 9. Run the backend using F5
-10. Run the frontend using "npm start"
-11. Download any additional dependecies requested
+10. https://localhost:53747 will open in your browser, add /swagger to the end to view and interact directley wiht our functions.
+11. Run the frontend using "npm start"
+12. A bowser with the actual frontendd app will appear
+13. Download any additional dependecies requested
